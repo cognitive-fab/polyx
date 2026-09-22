@@ -8,9 +8,25 @@ Source-available under the Business Source License 1.1, converting to Apache-2.0
 - `docs/polyx-technical-spec.md` — how
 - `docs/polyx-implementation-plan.md` — in what order, with gates
 
-## Run
+## Install
 
-Node ≥ 22.18 (TypeScript is run directly under Node's type stripping, unflagged from 22.18 / 23.6; `npm run build` emits `dist/`).
+Node ≥ 22.18.
+
+```
+npm install -g @cognitive-fab/polyx      # or npx @cognitive-fab/polyx …
+polyx audit synthetic                     # a fixture that ships with the lens; needs a polyx.config.json — copy the one from this repository
+```
+
+`@cognitive-fab/polyx-lens`, the Apache-2.0 front half, installs with it and
+can be used on its own: `npx @cognitive-fab/polyx-lens` reads your Claude Code
+transcripts in place and reports which of the rules the agent was given it
+kept, with nothing else installed.
+
+## Run from a checkout
+
+TypeScript runs directly under Node's type stripping (unflagged from 22.18 /
+23.6); an installed copy runs the compiled `dist/`, because Node does not
+strip types under `node_modules`. `npm run build` emits it.
 
 ```
 npm install
