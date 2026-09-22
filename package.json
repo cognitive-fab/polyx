@@ -1,6 +1,6 @@
 {
   "name": "@cognitive-fab/polyx",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "description": "Mine the rules a customer-service agent's own history supports, and serve them back with abstention.",
   "repository": {
