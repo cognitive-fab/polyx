@@ -83,6 +83,14 @@ all of them), with the path made absolute:
   "hooks": [ { "type": "command", "command": "node /path/to/polyx/examples/claude-code-hook/polyx-hook.mjs", "timeout": 5 } ] } ] } }
 ```
 
+Rules are mined per project, so the same rule is one row per project it was
+found in. To mean it for all of them, press **Real everywhere** (`E`) on the
+review page, or `node bin/polyx.mjs review cc mark <rule-id> real --everywhere`:
+each row it is proposed for is marked at its own support, and the rows left
+alone — refused, already ruled on, standing behind another rule — are listed.
+A project the rule was never mined for gets nothing; there is no evidence
+there to record the verdict against.
+
 The matcher is the set of tools that can be consequential. `Read`, `Grep`
 and `Glob` are `none` in the alphabet and never a decision point; leaving
 them out of the matcher saves a round trip that would always allow.

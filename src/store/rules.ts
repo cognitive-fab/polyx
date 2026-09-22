@@ -299,6 +299,54 @@ export function adjudicate(store: Store, ruleId: string, verdict: ReviewVerdict,
   return loadRule(store, ruleId, rule.scope, rule.corpus)!;
 }
 
+/**
+ * One verdict for every project the rule was mined for — "real everywhere".
+ *
+ * The same rule mined for twenty-five operators is twenty-five rows, each with
+ * its own support, and until now each wanted its own verdict: a reviewer who
+ * meant "read the file before editing it" had to say so twenty-five times.
+ * This records the verdict row by row, at each row's own support, so the
+ * audit trail is exactly what twenty-five separate marks would have left.
+ *
+ * Only rows still `proposed` are marked. A refused row has no evidence at
+ * that operator, own or borrowed, and "everywhere" is not a claim that the
+ * evidence is wrong; a row a person already ruled on keeps that ruling; a
+ * suppressed or contradicted row stands behind another rule. Each is
+ * returned in `skipped` with its status, so nothing is left out silently.
+ * Operators the rule was never mined for get nothing: there is no row to
+ * carry the support a verdict is recorded at.
+ */
+export function adjudicateEverywhere(
+  store: Store,
+  ruleId: string,
+  verdict: ReviewVerdict,
+  opts: Omit<NonNullable<Parameters<typeof adjudicate>[3]>, 'scope'> & { corpus: string },
+): { marked: Rule[]; skipped: Array<{ scope: string; status: RuleStatus }> } {
+  const rows = store.prepare('SELECT scope, status FROM rules WHERE id = ? AND corpus = ? ORDER BY scope').all(ruleId, opts.corpus) as Array<{ scope: string; status: RuleStatus }>;
+  if (!rows.length) throw new Error(`no rule ${ruleId} in ${opts.corpus}`);
+  const marked: Rule[] = [];
+  const skipped: Array<{ scope: string; status: RuleStatus }> = [];
+  const at = opts.at ?? Date.now();
+  // All or nothing: a JF4.3 refusal on the first row is a refusal on every
+  // row (the conditions are the rule's, not the row's), and a half-applied
+  // "everywhere" would be the one state a reviewer could not tell from the page.
+  store.exec('BEGIN');
+  try {
+    for (const r of rows) {
+      if (r.status !== 'proposed') {
+        skipped.push({ scope: r.scope, status: r.status });
+        continue;
+      }
+      marked.push(adjudicate(store, ruleId, verdict, { ...opts, scope: r.scope, at }));
+    }
+    store.exec('COMMIT');
+  } catch (e) {
+    store.exec('ROLLBACK');
+    throw e;
+  }
+  return { marked, skipped };
+}
+
 export function adjudications(store: Store, ruleId?: string, scope?: string, corpus?: string): Adjudication[] {
   const where: string[] = [];
   const args: string[] = [];

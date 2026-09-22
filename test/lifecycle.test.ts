@@ -6,7 +6,7 @@ import { cmdMine, cmdReview, recordRun } from '../src/cli/main.ts';
 import { mine } from '../src/mine/index.ts';
 import { loadCorpus } from '@cognitive-fab/polyx-lens';
 import { openStore } from '../src/store/db.ts';
-import { adjudicate, adjudications, loadRule, loadRules, pendingNarrowings, persistMined, reviewPace } from '../src/store/rules.ts';
+import { adjudicate, adjudicateEverywhere, adjudications, loadRule, loadRules, pendingNarrowings, persistMined, reviewPace } from '../src/store/rules.ts';
 import { capture, tempWorkspace, type TempWorkspace } from './helpers.ts';
 
 const R1 = (rules: Rule[]) =>
@@ -174,6 +174,42 @@ test('the review CLI: list, show with both kinds of evidence, mark, pace', async
     assert.equal(reviewPace(s2).verdicts, 1);
     assert.equal(reviewPace(s2).medianSeconds, null);
     s2.close();
+  } finally {
+    ws.cleanup();
+  }
+});
+
+test('real everywhere: one verdict, recorded row by row at each row\'s own support, and nothing else touched', async () => {
+  const ws = tempWorkspace({ borrowedOperators: 1 });
+  try {
+    const { rules } = await mineInto(ws);
+    // A rule proposed for more than one operator, so "everywhere" means something.
+    const byId = new Map<string, Rule[]>();
+    for (const r of rules) byId.set(r.id, [...(byId.get(r.id) ?? []), r]);
+    const [id, rows] = [...byId].find(([, rs]) => rs.filter((r) => r.status === 'proposed').length >= 2)!;
+    const proposed = rows.filter((r) => r.status === 'proposed').map((r) => r.scope).sort();
+    const store = openStore(ws.config.dbPath);
+    try {
+      // A person already ruled on one row: that ruling stands.
+      const ruled = proposed[0]!;
+      adjudicate(store, id, 'not_real', { scope: ruled, corpus: 'synthetic', at: 1 });
+      const { marked, skipped } = adjudicateEverywhere(store, id, 'real', { corpus: 'synthetic', reviewer: 'lead', at: 2 });
+      assert.deepEqual(marked.map((r) => r.scope).sort(), proposed.slice(1));
+      assert.ok(marked.every((r) => r.status === 'real'));
+      assert.deepEqual(skipped.find((s) => s.scope === ruled), { scope: ruled, status: 'not_real' });
+      assert.equal(marked.length + skipped.length, rows.length, 'every row is either marked or named');
+      // The trail is what separate marks would have left: one per row, at that row's support.
+      for (const r of marked) {
+        const a = adjudications(store, id, r.scope, 'synthetic').at(-1)!;
+        assert.equal(a.verdict, 'real');
+        assert.equal(a.reviewer, 'lead');
+        assert.deepEqual(a.support, rows.find((x) => x.scope === r.scope)!.support);
+      }
+    } finally {
+      store.close();
+    }
+    // One project or all of them — not both.
+    await assert.rejects(cmdReview({ config: ws.config, thresholds: ws.thresholds, out: () => {}, err: () => {} }, 'synthetic', ['mark', id, 'real'], { everywhere: true, scope: 'op-alpha' }), /contradict each other/);
   } finally {
     ws.cleanup();
   }

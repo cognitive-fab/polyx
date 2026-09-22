@@ -33,7 +33,7 @@ import { startLabelServer } from '../ports/jev/label-server.ts';
 import { annotate, writePreview } from '../ports/jev/annotate.ts';
 import { observerFromEnv } from '../ports/jev/observer.ts';
 import { openStore, type Store } from '../store/db.ts';
-import { adjudicate, adjudications, loadRule, loadRules, pendingNarrowings, persistMined, reviewPace, type ReviewVerdict } from '../store/rules.ts';
+import { adjudicate, adjudicateEverywhere, adjudications, loadRule, loadRules, pendingNarrowings, persistMined, reviewPace, type ReviewVerdict } from '../store/rules.ts';
 import { withThresholds, type Thresholds } from '@cognitive-fab/polyx-lens';
 
 const USAGE = `usage: polyx <command> [options]
@@ -48,7 +48,8 @@ const USAGE = `usage: polyx <command> [options]
       the rules awaiting adjudication (--all: every status)
   review <corpus> show <rule-id>
       one rule with its supporting and contradicting records
-  review <corpus> mark <rule-id> real|not_real|narrowed [--note ..] [--reviewer ..] [--condition fact=value]
+  review <corpus> mark <rule-id> real|not_real|narrowed [--note ..] [--reviewer ..] [--condition fact=value] [--everywhere]
+      (--everywhere: the same verdict for every project the rule is proposed for)
   review <corpus> serve [--port N] [--all] [--sample N]
       the domain reviewer's surface: one rule per screen, verdicts saved as given
   review <corpus> pace
@@ -673,7 +674,7 @@ function renderRule(r: Rule, detail = false): string {
   return lines.join('\n');
 }
 
-export async function cmdReview(ctx: Ctx, corpusName: string, args: string[], opts: { json?: boolean; all?: boolean; note?: string; reviewer?: string; condition?: string; scope?: string; port?: number; sample?: number }) {
+export async function cmdReview(ctx: Ctx, corpusName: string, args: string[], opts: { json?: boolean; all?: boolean; note?: string; reviewer?: string; condition?: string; scope?: string; port?: number; sample?: number; everywhere?: boolean }) {
   const [sub, id, verdictArg] = args;
   if (sub === 'serve') {
     const corpus = await loadCorpus(ctx.config, corpusName);
@@ -743,6 +744,18 @@ export async function cmdReview(ctx: Ctx, corpusName: string, args: string[], op
       if (opts.scope) o.scope = opts.scope;
       o.corpus = corpusName;
       o.predicates = predicateSetFor(ctx, corpusName);
+      if (opts.everywhere) {
+        if (opts.scope) throw new Error('--everywhere and --scope contradict each other: one project, or all of them');
+        const { scope: _, ...rest } = o;
+        const { marked, skipped } = adjudicateEverywhere(store, id, verdictArg as ReviewVerdict, { ...rest, corpus: corpusName });
+        ctx.out(`${id} marked ${verdictArg} for ${marked.length} project(s):`);
+        for (const r of marked) ctx.out(`  ${r.scope.padEnd(24)} ${r.support.holds}/${r.support.of}  ${r.provenance.kind === 'own' ? 'own' : r.provenance.kind}`);
+        if (skipped.length) {
+          ctx.out(`left as they are (${skipped.length}):`);
+          for (const s of skipped) ctx.out(`  ${s.scope.padEnd(24)} ${s.status}`);
+        }
+        return 0;
+      }
       const r = adjudicate(store, id, verdictArg as ReviewVerdict, o);
       ctx.out(renderRule(r));
       return 0;
@@ -965,6 +978,7 @@ export async function main(argv: string[], io: { out?: (s: string) => void; err?
       json: { type: 'boolean' },
       show: { type: 'string' },
       'dry-run': { type: 'boolean' },
+      everywhere: { type: 'boolean' },
       import: { type: 'string' },
       budget: { type: 'string' },
       concurrency: { type: 'string' },
@@ -1074,6 +1088,7 @@ export async function main(argv: string[], io: { out?: (s: string) => void; err?
       if (values.scope) opts.scope = values.scope;
       if (values.port) opts.port = Number(values.port);
       if (values.sample) opts.sample = Number(values.sample);
+      if (values.everywhere) opts.everywhere = true;
       return cmdReview(ctx, corpus, [sub, ...args], opts);
     }
     case 'gold': {

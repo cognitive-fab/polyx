@@ -14,7 +14,7 @@ import { renderCondition } from '@cognitive-fab/polyx-lens';
 import { verdict as verdictLabel } from '../mine/index.ts';
 import { resolveRaw } from '../show.ts';
 import { openStore, type Store } from '../store/db.ts';
-import { adjudicate, adjudications, loadRule, loadRules, reviewPace, type ReviewVerdict } from '../store/rules.ts';
+import { adjudicate, adjudicateEverywhere, adjudications, loadRule, loadRules, reviewPace, type ReviewVerdict } from '../store/rules.ts';
 import { evalCondition } from '@cognitive-fab/polyx-lens';
 import { cmp } from '@cognitive-fab/polyx-lens';
 import { consequentialTypes } from '@cognitive-fab/polyx-lens';
@@ -206,7 +206,12 @@ export async function startReviewServer(opts: ReviewServerOptions): Promise<{ po
           json(res, 200, { done: true });
           return;
         }
-        json(res, 200, ruleView(store, opts.corpus, byId, rule, rule.family === 'recommendation' ? await decisions() : undefined));
+        // The other projects this same rule stands proposed for: what "real
+        // everywhere" would mark, shown before the reviewer presses it.
+        const elsewhere = loadRules(store, { corpus: corpusName, status: ['proposed'] })
+          .filter((r) => r.id === rule.id && r.scope !== rule.scope)
+          .map((r) => ({ scope: r.scope, support: r.support }));
+        json(res, 200, { ...ruleView(store, opts.corpus, byId, rule, rule.family === 'recommendation' ? await decisions() : undefined), elsewhere });
         return;
       }
       if (req.method === 'GET' && url.pathname === '/api/raw') {
@@ -237,6 +242,12 @@ export async function startReviewServer(opts: ReviewServerOptions): Promise<{ po
         if (typeof body.reviewer === 'string' && body.reviewer) o.reviewer = body.reviewer;
         if (body.condition && typeof body.condition === 'object') o.condition = body.condition as Condition;
         o.predicates = opts.predicates ?? null;
+        if (body.everywhere === true) {
+          const { scope: _, ...rest } = o;
+          const { marked, skipped } = adjudicateEverywhere(store, id, v as ReviewVerdict, { ...rest, corpus: corpusName });
+          json(res, 200, { ok: true, marked: marked.map((r) => r.scope), skipped });
+          return;
+        }
         const rule = adjudicate(store, id, v as ReviewVerdict, o);
         json(res, 200, { ok: true, status: rule.status });
         return;
@@ -324,6 +335,7 @@ const PAGE = /* html */ `<!doctype html>
 <footer id="footer" hidden>
   <button class="real" onclick="mark('real')" title="yes, this operation follows this rule — the advisor may serve it">Real<kbd>R</kbd></button>
   <button class="not" onclick="mark('not_real')" title="a coincidence, not a policy — not re-proposed unless its support moves">Not real<kbd>N</kbd></button>
+  <button class="real" id="everywhere" onclick="mark('real', undefined, true)" hidden title="real for this project and every other project this rule is proposed for, each at its own support">Real everywhere<kbd>E</kbd></button>
   <button onclick="narrow()" title="true, but too broad — you name a condition and the next mine emits a narrower rule">Needs narrowing<kbd>W</kbd></button>
   <input type="text" id="note" placeholder="note (optional)">
   <input type="text" id="reviewer" placeholder="your name" style="max-width:160px">
@@ -345,6 +357,10 @@ async function load() {
   if (!next) { current = null; $('#footer').hidden = true; $('#main').innerHTML = '<div class="done">' + (q.remaining ? 'Everything left was skipped. Reload to see it again.' : 'Nothing left to review.') + '</div>'; return; }
   const v = await (await fetch('/api/rule?id=' + next.id + '&scope=' + encodeURIComponent(next.scope))).json();
   current = v.rule; render(v); $('#footer').hidden = false; $('#note').value = '';
+  const n = (v.elsewhere || []).length;
+  $('#everywhere').hidden = n === 0;
+  $('#everywhere').firstChild.textContent = 'Real everywhere (' + (n + 1) + ' projects)';
+  $('#everywhere').title = 'real here and for ' + v.elsewhere.map((e) => e.scope + ' ' + e.support.holds + '/' + e.support.of).join(', ');
 }
 function label(t, labels) { return labels[t] || t.replace(/^[a-z]+:/, '').replace(/[_-]+/g, ' '); }
 function tl(t, r, kind) {
@@ -418,10 +434,11 @@ async function raw(a, id, seq) {
   const pre = document.createElement('div'); pre.className = 'raw'; pre.textContent = r.raw.file + r.raw.path + '\\n' + JSON.stringify(r.record);
   a.parentElement.appendChild(pre); a.remove(); return false;
 }
-async function mark(verdict, condition) {
+async function mark(verdict, condition, everywhere) {
   if (!current) return;
   const body = { id: current.id, scope: current.scope, verdict, note: $('#note').value, reviewer: $('#reviewer').value };
   if (condition) body.condition = condition;
+  if (everywhere) body.everywhere = true;
   const r = await (await fetch('/api/adjudicate', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) })).json();
   if (r.error) { alert(r.error); return; }
   load();
@@ -439,6 +456,7 @@ document.addEventListener('keydown', (e) => {
   if (e.target.tagName === 'INPUT') return;
   if (e.key === 'r' || e.key === 'R') mark('real');
   else if (e.key === 'n' || e.key === 'N') mark('not_real');
+  else if ((e.key === 'e' || e.key === 'E') && !$('#everywhere').hidden) mark('real', undefined, true);
   else if (e.key === 'w' || e.key === 'W') narrow();
   else if (e.key === 's' || e.key === 'S') skip();
 });

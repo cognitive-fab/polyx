@@ -54,6 +54,24 @@ test('review server: queue, rule view with contradicting evidence, adjudicate, p
     assert.equal(loadRule(store, r1.id, r1.scope)!.status, 'real');
     assert.equal(reviewPace(store).verdicts, 1);
     store.close();
+
+    // Real everywhere: the page is told which other projects the rule stands
+    // proposed for, and one press marks them all.
+    let shared: { id: string; scope: string; elsewhere: Array<{ scope: string }> } | undefined;
+    for (const r of (await get('/api/queue')).queue as Array<{ id: string; scope: string }>) {
+      const view = (await get(`/api/rule?id=${r.id}&scope=${r.scope}`)) as { elsewhere: Array<{ scope: string }> };
+      if (view.elsewhere.length) {
+        shared = { ...r, elsewhere: view.elsewhere };
+        break;
+      }
+    }
+    assert.ok(shared, 'the synthetic corpus has a rule proposed for more than one operator');
+    assert.match(page, /Real everywhere/);
+    const all = (await post({ id: shared.id, scope: shared.scope, verdict: 'real', everywhere: true })) as { marked: string[] };
+    assert.deepEqual(all.marked.sort(), [shared.scope, ...shared.elsewhere.map((e) => e.scope)].sort());
+    const after = openStore(ws.config.dbPath);
+    for (const scope of all.marked) assert.equal(loadRule(after, shared.id, scope)!.status, 'real');
+    after.close();
   } finally {
     await srv?.close();
     ws.cleanup();
