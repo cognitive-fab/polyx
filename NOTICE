@@ -1,0 +1,30 @@
+polyx
+Copyright (c) 2026 Cognitive Fab LLC. Licensed under the Business Source License 1.1;
+see LICENSE for the parameters and LICENSING.md for why. Not an Open Source
+licence: each version converts to Apache-2.0 four years after publication.
+
+One directory of this repository is not under the Business Source License:
+
+src/ports/jev/ — the observation-port adapter for TypeSafe's Jev
+  Licensed under the MIT License; the text is at src/ports/jev/LICENSE and
+  every file in the directory carries an SPDX header saying so. It is the only
+  code in polyx that makes a network call, and it is carved out so that it can
+  be read, copied and replaced without a licence question: a second System One
+  implementation, or a local classifier, drops in behind the same interface.
+
+This product includes software developed by third parties:
+
+polyx-lens — https://github.com/cognitive-fab/polyx-lens
+  Licensed under the Apache License, Version 2.0.
+  The front half of this system — the canonical record, the alphabet, the
+  ingest adapters, the three ports and the lens — is a separate package under a
+  separate licence, and polyx depends on it. Nothing in polyx-lens imports
+  polyx: the dependency runs one way, which is what makes the split real rather
+  than declared. The Apache-2.0 licence text is at licenses/APACHE-2.0.txt.
+
+  polyness reaches this build only through polyx-lens, which vendors the four
+  modules its ports use and carries their attribution. polyx no longer depends
+  on it directly.
+
+yaml — https://github.com/eemeli/yaml
+  Licensed under the ISC License.

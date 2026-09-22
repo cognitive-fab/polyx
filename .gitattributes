@@ -1,0 +1,6 @@
+# Every figure polyx quotes is a hash over bytes — corpusRevision over a
+# fixture, annotationDigest over an annotation file — so the bytes must be the
+# same on every checkout. Line endings are LF everywhere, whatever the host.
+* text=auto eol=lf
+*.png binary
+*.db binary

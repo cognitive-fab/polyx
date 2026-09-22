@@ -1,0 +1,202 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Which written rules may be shipped, and which never?",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/cognitive-fab/polyx",
+      "revision": "9fb805bbd68483f4417a1c7fec4c24328f64bf8f"
+    },
+    "views": [
+      {
+        "id": "answer",
+        "label": "Which written rules may be shipped, and which n…",
+        "focus": [
+          "bench-keys",
+          "eval-keys"
+        ],
+        "note": "A clause set decomposes somebody else’s written rules so the miner can be scored against them. Two repositories hold them, split by whether…"
+      },
+      {
+        "id": "paid",
+        "label": "polyx — BUSL 1.1",
+        "focus": [
+          "miner",
+          "evaluator"
+        ],
+        "note": "Source-available, internal use granted, Apache-2.0 in four years: the half that turns a corpus into rules nobody wrote down, and the half t…"
+      },
+      {
+        "id": "keys",
+        "label": "Answer keys",
+        "focus": [
+          "bench-keys",
+          "eval-keys"
+        ],
+        "note": "Written rulebooks decomposed by hand into clauses, used to score the miner and never used by it — a shipped answer key would be a shipped e…"
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "bench-keys",
+      "type": "database",
+      "label": "polyx-bench",
+      "pos": [
+        700,
+        286
+      ],
+      "size": [
+        150,
+        62
+      ],
+      "sublabel": "public rulebooks"
+    },
+    {
+      "id": "eval-keys",
+      "type": "database",
+      "label": "polyx-eval",
+      "pos": [
+        700,
+        366
+      ],
+      "size": [
+        150,
+        62
+      ],
+      "sublabel": "private rulebooks"
+    },
+    {
+      "id": "evaluator",
+      "type": "backend",
+      "label": "Evaluator",
+      "pos": [
+        1020,
+        167
+      ],
+      "size": [
+        150,
+        62
+      ],
+      "sublabel": "precision, recall, refusal",
+      "sources": [
+        {
+          "path": "src/evaluate/index.ts",
+          "label": "the headline figures"
+        }
+      ]
+    },
+    {
+      "id": "miner",
+      "type": "backend",
+      "label": "Miner",
+      "pos": [
+        380,
+        167
+      ],
+      "size": [
+        150,
+        62
+      ],
+      "sublabel": "patterns, provenance",
+      "sources": [
+        {
+          "path": "src/mine/index.ts",
+          "label": "mine()"
+        },
+        {
+          "path": "src/mine/patterns.ts",
+          "label": "the pattern table"
+        },
+        {
+          "path": "src/mine/facts.ts",
+          "label": "a withheld observation is evidence"
+        }
+      ]
+    },
+    {
+      "id": "contracts",
+      "type": "database",
+      "label": "Contract sets",
+      "pos": [
+        60,
+        48
+      ],
+      "size": [
+        150,
+        62
+      ],
+      "sublabel": "what a harness publishes"
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "security-group",
+      "label": "polyx — BUSL 1.1",
+      "wraps": [
+        "miner",
+        "evaluator"
+      ],
+      "pad": 20
+    },
+    {
+      "kind": "region",
+      "label": "Answer keys",
+      "wraps": [
+        "bench-keys",
+        "eval-keys"
+      ],
+      "pad": 20
+    }
+  ],
+  "connections": [
+    {
+      "from": "bench-keys",
+      "to": "evaluator",
+      "label": "public clause sets · file",
+      "labelAt": [
+        775,
+        246
+      ],
+      "variant": "security"
+    },
+    {
+      "from": "eval-keys",
+      "to": "evaluator",
+      "label": "private clause sets · file",
+      "labelAt": [
+        775,
+        362
+      ],
+      "variant": "security"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "The short answer",
+      "items": [
+        "A clause set decomposes somebody else’s written rules so the miner can be scored against them",
+        "Two repositories hold them, split by whether the source rulebook is public: benchmark decompositions can be read by anyone checking a published figure, and anything derived from a private corpus is licensed to nobody",
+        "Neither is reachable from the mining side"
+      ]
+    },
+    {
+      "dot": "slate",
+      "title": "Not shown here",
+      "items": [
+        "The three-region diff and the serving path — the advisor never sees a clause set",
+        "Connected but out of scope: Clause checker, Pipeline, Ports, Store, Three-region diff, Annotation store"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Constraints",
+      "items": [
+        "An answer key is never distributed to anyone — a shipped answer key is a shipped evaluation, and the decompositions are months of judgement rather than code",
+        "A contract set ships; an answer key does not — a contract set decomposes what a harness publishes about itself, so it holds for every installation and gives a first run something true to say — same shape, opposite purpose"
+      ]
+    }
+  ]
+}

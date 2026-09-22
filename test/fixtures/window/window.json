@@ -1,0 +1,485 @@
+{
+ "corpus": "synthetic",
+ "interactions": [
+  {
+   "id": "wnd-0001",
+   "operator": "op-alpha",
+   "team": "t-alpha",
+   "agent": "a1",
+   "startedAt": 1770022800000,
+   "outcome": "resolved",
+   "turns": [
+    {
+     "speaker": "customer",
+     "intent": "refund_request",
+     "slots": {
+      "order_id": "ORD-2000"
+     },
+     "text": "I would like a refund."
+    },
+    {
+     "speaker": "action",
+     "button": "verify-identity",
+     "slots": {
+      "account_id": "ACC-99887766"
+     }
+    },
+    {
+     "speaker": "action",
+     "button": "lookup-order",
+     "slots": {
+      "order_id": "ORD-2000"
+     }
+    },
+    {
+     "speaker": "customer",
+     "intent": "complaint",
+     "slots": {
+      "account_id": "ACC-99887766"
+     },
+     "text": "And while you are here, this took far too long."
+    },
+    {
+     "speaker": "action",
+     "button": "issue-refund",
+     "slots": {
+      "amount": 20,
+      "order_id": "ORD-2000"
+     }
+    }
+   ]
+  },
+  {
+   "id": "wnd-0002",
+   "operator": "op-alpha",
+   "team": "t-alpha",
+   "agent": "a1",
+   "startedAt": 1770026400000,
+   "outcome": "resolved",
+   "turns": [
+    {
+     "speaker": "customer",
+     "intent": "refund_request",
+     "slots": {
+      "order_id": "ORD-2001"
+     },
+     "text": "I would like a refund."
+    },
+    {
+     "speaker": "action",
+     "button": "verify-identity",
+     "slots": {
+      "account_id": "ACC-99887766"
+     }
+    },
+    {
+     "speaker": "action",
+     "button": "lookup-order",
+     "slots": {
+      "order_id": "ORD-2001"
+     }
+    },
+    {
+     "speaker": "customer",
+     "intent": "complaint",
+     "slots": {
+      "account_id": "ACC-99887766"
+     },
+     "text": "And while you are here, this took far too long."
+    },
+    {
+     "speaker": "action",
+     "button": "issue-refund",
+     "slots": {
+      "amount": 21,
+      "order_id": "ORD-2001"
+     }
+    }
+   ]
+  },
+  {
+   "id": "wnd-0003",
+   "operator": "op-alpha",
+   "team": "t-alpha",
+   "agent": "a1",
+   "startedAt": 1770030000000,
+   "outcome": "resolved",
+   "turns": [
+    {
+     "speaker": "customer",
+     "intent": "refund_request",
+     "slots": {
+      "order_id": "ORD-2002"
+     },
+     "text": "I would like a refund."
+    },
+    {
+     "speaker": "action",
+     "button": "verify-identity",
+     "slots": {
+      "account_id": "ACC-99887766"
+     }
+    },
+    {
+     "speaker": "action",
+     "button": "lookup-order",
+     "slots": {
+      "order_id": "ORD-2002"
+     }
+    },
+    {
+     "speaker": "customer",
+     "intent": "complaint",
+     "slots": {
+      "account_id": "ACC-99887766"
+     },
+     "text": "And while you are here, this took far too long."
+    },
+    {
+     "speaker": "action",
+     "button": "issue-refund",
+     "slots": {
+      "amount": 22,
+      "order_id": "ORD-2002"
+     }
+    }
+   ]
+  },
+  {
+   "id": "wnd-0004",
+   "operator": "op-alpha",
+   "team": "t-alpha",
+   "agent": "a1",
+   "startedAt": 1770033600000,
+   "outcome": "resolved",
+   "turns": [
+    {
+     "speaker": "customer",
+     "intent": "refund_request",
+     "slots": {
+      "order_id": "ORD-2003"
+     },
+     "text": "I would like a refund."
+    },
+    {
+     "speaker": "action",
+     "button": "verify-identity",
+     "slots": {
+      "account_id": "ACC-99887766"
+     }
+    },
+    {
+     "speaker": "action",
+     "button": "lookup-order",
+     "slots": {
+      "order_id": "ORD-2003"
+     }
+    },
+    {
+     "speaker": "customer",
+     "intent": "complaint",
+     "slots": {
+      "account_id": "ACC-99887766"
+     },
+     "text": "And while you are here, this took far too long."
+    },
+    {
+     "speaker": "action",
+     "button": "issue-refund",
+     "slots": {
+      "amount": 23,
+      "order_id": "ORD-2003"
+     }
+    }
+   ]
+  },
+  {
+   "id": "wnd-0005",
+   "operator": "op-alpha",
+   "team": "t-alpha",
+   "agent": "a1",
+   "startedAt": 1770037200000,
+   "outcome": "resolved",
+   "turns": [
+    {
+     "speaker": "customer",
+     "intent": "refund_request",
+     "slots": {
+      "order_id": "ORD-2004"
+     },
+     "text": "I would like a refund."
+    },
+    {
+     "speaker": "action",
+     "button": "verify-identity",
+     "slots": {
+      "account_id": "ACC-99887766"
+     }
+    },
+    {
+     "speaker": "action",
+     "button": "lookup-order",
+     "slots": {
+      "order_id": "ORD-2004"
+     }
+    },
+    {
+     "speaker": "customer",
+     "intent": "complaint",
+     "slots": {
+      "account_id": "ACC-99887766"
+     },
+     "text": "And while you are here, this took far too long."
+    },
+    {
+     "speaker": "action",
+     "button": "issue-refund",
+     "slots": {
+      "amount": 24,
+      "order_id": "ORD-2004"
+     }
+    }
+   ]
+  },
+  {
+   "id": "wnd-0006",
+   "operator": "op-alpha",
+   "team": "t-alpha",
+   "agent": "a1",
+   "startedAt": 1770040800000,
+   "outcome": "resolved",
+   "turns": [
+    {
+     "speaker": "customer",
+     "intent": "refund_request",
+     "slots": {
+      "order_id": "ORD-2005"
+     },
+     "text": "I would like a refund."
+    },
+    {
+     "speaker": "action",
+     "button": "verify-identity",
+     "slots": {
+      "account_id": "ACC-99887766"
+     }
+    },
+    {
+     "speaker": "action",
+     "button": "lookup-order",
+     "slots": {
+      "order_id": "ORD-2005"
+     }
+    },
+    {
+     "speaker": "customer",
+     "intent": "complaint",
+     "slots": {
+      "account_id": "ACC-99887766"
+     },
+     "text": "And while you are here, this took far too long."
+    },
+    {
+     "speaker": "action",
+     "button": "issue-refund",
+     "slots": {
+      "amount": 25,
+      "order_id": "ORD-2005"
+     }
+    }
+   ]
+  },
+  {
+   "id": "wnd-0007",
+   "operator": "op-alpha",
+   "team": "t-alpha",
+   "agent": "a1",
+   "startedAt": 1770044400000,
+   "outcome": "resolved",
+   "turns": [
+    {
+     "speaker": "customer",
+     "intent": "refund_request",
+     "slots": {
+      "order_id": "ORD-2006"
+     },
+     "text": "I would like a refund."
+    },
+    {
+     "speaker": "action",
+     "button": "verify-identity",
+     "slots": {
+      "account_id": "ACC-99887766"
+     }
+    },
+    {
+     "speaker": "action",
+     "button": "lookup-order",
+     "slots": {
+      "order_id": "ORD-2006"
+     }
+    },
+    {
+     "speaker": "customer",
+     "intent": "complaint",
+     "slots": {
+      "account_id": "ACC-99887766"
+     },
+     "text": "And while you are here, this took far too long."
+    },
+    {
+     "speaker": "action",
+     "button": "issue-refund",
+     "slots": {
+      "amount": 26,
+      "order_id": "ORD-2006"
+     }
+    }
+   ]
+  },
+  {
+   "id": "wnd-0008",
+   "operator": "op-alpha",
+   "team": "t-alpha",
+   "agent": "a1",
+   "startedAt": 1770048000000,
+   "outcome": "resolved",
+   "turns": [
+    {
+     "speaker": "customer",
+     "intent": "refund_request",
+     "slots": {
+      "order_id": "ORD-2007"
+     },
+     "text": "I would like a refund."
+    },
+    {
+     "speaker": "action",
+     "button": "verify-identity",
+     "slots": {
+      "account_id": "ACC-99887766"
+     }
+    },
+    {
+     "speaker": "customer",
+     "intent": "complaint",
+     "slots": {
+      "account_id": "ACC-99887766"
+     },
+     "text": "And while you are here, this took far too long."
+    },
+    {
+     "speaker": "action",
+     "button": "issue-refund",
+     "slots": {
+      "amount": 27,
+      "order_id": "ORD-2007"
+     }
+    },
+    {
+     "speaker": "action",
+     "button": "lookup-order",
+     "slots": {
+      "order_id": "ORD-2007"
+     }
+    }
+   ]
+  },
+  {
+   "id": "wnd-0009",
+   "operator": "op-alpha",
+   "team": "t-alpha",
+   "agent": "a1",
+   "startedAt": 1770051600000,
+   "outcome": "resolved",
+   "turns": [
+    {
+     "speaker": "customer",
+     "intent": "refund_request",
+     "slots": {
+      "order_id": "ORD-2008"
+     },
+     "text": "I would like a refund."
+    },
+    {
+     "speaker": "action",
+     "button": "verify-identity",
+     "slots": {
+      "account_id": "ACC-99887766"
+     }
+    },
+    {
+     "speaker": "customer",
+     "intent": "complaint",
+     "slots": {
+      "account_id": "ACC-99887766"
+     },
+     "text": "And while you are here, this took far too long."
+    },
+    {
+     "speaker": "action",
+     "button": "issue-refund",
+     "slots": {
+      "amount": 28,
+      "order_id": "ORD-2008"
+     }
+    },
+    {
+     "speaker": "action",
+     "button": "lookup-order",
+     "slots": {
+      "order_id": "ORD-2008"
+     }
+    }
+   ]
+  },
+  {
+   "id": "wnd-0010",
+   "operator": "op-alpha",
+   "team": "t-alpha",
+   "agent": "a1",
+   "startedAt": 1770055200000,
+   "outcome": "resolved",
+   "turns": [
+    {
+     "speaker": "customer",
+     "intent": "refund_request",
+     "slots": {
+      "order_id": "ORD-2009"
+     },
+     "text": "I would like a refund."
+    },
+    {
+     "speaker": "action",
+     "button": "verify-identity",
+     "slots": {
+      "account_id": "ACC-99887766"
+     }
+    },
+    {
+     "speaker": "customer",
+     "intent": "complaint",
+     "slots": {
+      "account_id": "ACC-99887766"
+     },
+     "text": "And while you are here, this took far too long."
+    },
+    {
+     "speaker": "action",
+     "button": "issue-refund",
+     "slots": {
+      "amount": 29,
+      "order_id": "ORD-2009"
+     }
+    },
+    {
+     "speaker": "action",
+     "button": "lookup-order",
+     "slots": {
+      "order_id": "ORD-2009"
+     }
+    }
+   ]
+  }
+ ]
+}

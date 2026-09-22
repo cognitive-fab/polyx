@@ -1,0 +1,277 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "What can somebody run without buying anything?",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/cognitive-fab/polyx",
+      "revision": "9fb805bbd68483f4417a1c7fec4c24328f64bf8f"
+    },
+    "views": [
+      {
+        "id": "answer",
+        "label": "What can somebody run without buying anything?",
+        "focus": [
+          "lens-cli",
+          "report"
+        ],
+        "note": "It reads the transcripts the agent already wrote, types every event through a reviewed alphabet, and counts how often each written rule was…"
+      },
+      {
+        "id": "free",
+        "label": "polyx-lens — free",
+        "focus": [
+          "lens-cli",
+          "adapters",
+          "alphabet",
+          "pipeline",
+          "contracts",
+          "checker",
+          "report"
+        ],
+        "note": "Everything here runs without buying anything, imports nothing from the paid half, and can make no network call under any configuration — th…"
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "corpora",
+      "type": "database",
+      "label": "Corpora",
+      "pos": [
+        60,
+        48
+      ],
+      "size": [
+        150,
+        62
+      ],
+      "sublabel": "gitignored, never copied",
+      "sources": [
+        {
+          "path": "polyx.config.json",
+          "label": "corpora are named, not stored"
+        }
+      ]
+    },
+    {
+      "id": "adapters",
+      "type": "backend",
+      "label": "Ingest adapters",
+      "pos": [
+        380,
+        197
+      ],
+      "size": [
+        150,
+        62
+      ],
+      "sublabel": "5 formats, 1 pure fn each"
+    },
+    {
+      "id": "alphabet",
+      "type": "database",
+      "label": "Alphabet",
+      "pos": [
+        380,
+        298
+      ],
+      "size": [
+        150,
+        62
+      ],
+      "sublabel": "typing, redaction, ordinal"
+    },
+    {
+      "id": "pipeline",
+      "type": "backend",
+      "label": "Pipeline",
+      "pos": [
+        380,
+        398
+      ],
+      "size": [
+        150,
+        62
+      ],
+      "sublabel": "loadCorpus"
+    },
+    {
+      "id": "contracts",
+      "type": "database",
+      "label": "Contract sets",
+      "pos": [
+        700,
+        197
+      ],
+      "size": [
+        150,
+        62
+      ],
+      "sublabel": "what a harness publishes"
+    },
+    {
+      "id": "checker",
+      "type": "backend",
+      "label": "Clause checker",
+      "pos": [
+        700,
+        298
+      ],
+      "size": [
+        150,
+        62
+      ],
+      "sublabel": "clause x corpus, no model"
+    },
+    {
+      "id": "report",
+      "type": "backend",
+      "label": "The report",
+      "pos": [
+        700,
+        398
+      ],
+      "size": [
+        150,
+        62
+      ],
+      "sublabel": "leads with the unknown rate"
+    },
+    {
+      "id": "lens-cli",
+      "type": "frontend",
+      "label": "polyx-lens",
+      "pos": [
+        1020,
+        298
+      ],
+      "size": [
+        150,
+        62
+      ],
+      "sublabel": "no arguments needed"
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "security-group",
+      "label": "polyx-lens — free",
+      "wraps": [
+        "lens-cli",
+        "adapters",
+        "alphabet",
+        "pipeline",
+        "contracts",
+        "checker",
+        "report"
+      ],
+      "pad": 20
+    }
+  ],
+  "connections": [
+    {
+      "from": "corpora",
+      "to": "adapters",
+      "label": "read in place · file",
+      "labelAt": [
+        295,
+        60
+      ]
+    },
+    {
+      "from": "adapters",
+      "to": "pipeline",
+      "label": "raw interactions",
+      "labelAt": [
+        517,
+        374
+      ],
+      "fromSide": "right",
+      "toSide": "right",
+      "via": [
+        [
+          590,
+          228
+        ],
+        [
+          590,
+          429
+        ]
+      ]
+    },
+    {
+      "from": "alphabet",
+      "to": "pipeline",
+      "label": "type, redact, classify · file",
+      "labelAt": [
+        314,
+        373
+      ]
+    },
+    {
+      "from": "pipeline",
+      "to": "checker",
+      "label": "typed interactions",
+      "labelAt": [
+        675,
+        374
+      ]
+    },
+    {
+      "from": "contracts",
+      "to": "checker",
+      "label": "clause sets · file",
+      "labelAt": [
+        775,
+        272
+      ]
+    },
+    {
+      "from": "checker",
+      "to": "report",
+      "label": "kept, broken, never exercised",
+      "labelAt": [
+        775,
+        373
+      ]
+    },
+    {
+      "from": "report",
+      "to": "lens-cli",
+      "label": "the free report",
+      "labelAt": [
+        828,
+        474
+      ],
+      "variant": "emphasis"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "The short answer",
+      "items": [
+        "It reads the transcripts the agent already wrote, types every event through a reviewed alphabet, and counts how often each written rule was kept — with no store, no adjudication, no model call and no network",
+        "The report leads with what the alphabet could not name, because a figure measured over the share of actions a parser happened to understand is not a measurement"
+      ]
+    },
+    {
+      "dot": "slate",
+      "title": "Not shown here",
+      "items": [
+        "The ports and their polyness implementation, which the pipeline uses",
+        "and the miner, which this path never touches",
+        "Connected but out of scope: Ports, Miner"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "What it guarantees",
+      "items": [
+        "The free half contains no network code at all — nothing leaves the machine has to be inspectable rather than promised, and a corpus that must be uploaded is a corpus nobody will hand over"
+      ]
+    }
+  ]
+}

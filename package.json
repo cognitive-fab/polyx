@@ -1,0 +1,31 @@
+{
+  "name": "polyx",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Mine the rules a customer-service agent's own history supports, and serve them back with abstention.",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "bin": {
+    "polyx": "bin/polyx.mjs"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsc",
+    "test": "node --no-warnings --test --test-concurrency=1 \"test/**/*.test.ts\"",
+    "check:boundary": "node --no-warnings scripts/check-boundary.mjs",
+    "check:notice": "node --no-warnings scripts/check-notice.mjs",
+    "ci": "npm run typecheck && npm run check:boundary && npm run check:notice && npm run check:shippable && npm test",
+    "check:shippable": "node --no-warnings scripts/check-shippable.mjs"
+  },
+  "license": "BUSL-1.1",
+  "dependencies": {
+    "polyx-lens": "file:../polyx-lens",
+    "yaml": "^2.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.0"
+  }
+}

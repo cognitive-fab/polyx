@@ -1,0 +1,543 @@
+<title>The polyx Loop</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root{
+    --paper:#EEF1EE;
+    --surface:#FAFBF9;
+    --ink:#131F1D;
+    --muted:#5F6F6B;
+    --line:#C6D0CC;
+    --rule:#DCE3DF;
+    --accent:#0D5C57;
+    --own:#0D5C57;
+    --borrowed:#8A6110;
+    --neither:#9E3B27;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#0E1413;
+      --surface:#171F1E;
+      --ink:#E1E8E5;
+      --muted:#8CA09B;
+      --line:#31403D;
+      --rule:#243130;
+      --accent:#57C6B6;
+      --own:#57C6B6;
+      --borrowed:#D9A94F;
+      --neither:#E3846A;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0E1413;
+    --surface:#171F1E;
+    --ink:#E1E8E5;
+    --muted:#8CA09B;
+    --line:#31403D;
+    --rule:#243130;
+    --accent:#57C6B6;
+    --own:#57C6B6;
+    --borrowed:#D9A94F;
+    --neither:#E3846A;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font:400 16px/1.65 "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1140px;margin:0 auto;padding:0 28px 88px}
+
+  header.mast{padding:64px 0 34px;border-bottom:2px solid var(--ink)}
+  .eyebrow{
+    font:500 11px/1 "IBM Plex Mono", ui-monospace, monospace;
+    letter-spacing:.16em;text-transform:uppercase;color:var(--muted);
+  }
+  h1{
+    font:600 clamp(38px,6.2vw,66px)/1.03 Spectral, Georgia, serif;
+    margin:14px 0 0;letter-spacing:-.015em;text-wrap:balance;
+  }
+  h1 .dim{color:var(--muted)}
+  .thesis{margin:22px 0 0;max-width:63ch;font-size:19px;line-height:1.55}
+  .metastrip{
+    display:flex;flex-wrap:wrap;gap:8px 26px;margin-top:28px;
+    font:500 11px/1.5 "IBM Plex Mono", monospace;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--muted);
+  }
+
+  section{padding:54px 0 6px;border-top:1px solid var(--rule)}
+  section:first-of-type{border-top:none}
+  h2{
+    font:600 clamp(24px,3vw,32px)/1.16 Spectral, Georgia, serif;
+    margin:10px 0 0;letter-spacing:-.01em;text-wrap:balance;
+  }
+  .lede{margin:15px 0 0;max-width:66ch}
+  p{margin:15px 0 0;max-width:66ch}
+  .cols{display:grid;grid-template-columns:1fr;gap:0}
+  @media (min-width:900px){.cols{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 44px}}
+  strong{font-weight:600}
+  code,.mono{font:500 .92em/1.4 "IBM Plex Mono", ui-monospace, monospace}
+  code{background:var(--paper);border:1px solid var(--line);border-radius:2px;padding:.08em .34em}
+
+  figure{
+    margin:34px 0 0;background:var(--surface);
+    border:1px solid var(--line);border-radius:3px;padding:26px 8px 0;
+  }
+  .scroller{overflow-x:auto;padding:0 18px 4px}
+  figure svg{display:block;width:100%;min-width:640px;height:auto;color:var(--ink)}
+  figcaption{
+    padding:16px 26px 20px;border-top:1px solid var(--rule);margin-top:18px;
+    font-size:13.5px;line-height:1.58;color:var(--muted);
+  }
+  figcaption b{color:var(--ink);font-weight:600}
+
+  .bx{fill:var(--surface);stroke:currentColor;stroke-width:1.3}
+  .bx-own{stroke:var(--own);stroke-width:1.8}
+  .bx-bor{stroke:var(--borrowed);stroke-width:1.6}
+  .bx-nei{stroke:var(--neither);stroke-width:1.4;stroke-dasharray:5 3.5}
+  .bx-soft{fill:none;stroke:var(--line);stroke-width:1.2;stroke-dasharray:3 4}
+  .t{font:500 13.5px "IBM Plex Sans",sans-serif;fill:currentColor}
+  .tm{font:500 12.5px "IBM Plex Mono",monospace;fill:currentColor}
+  .ts{font:400 11.5px "IBM Plex Sans",sans-serif;fill:var(--muted)}
+  .tl{font:500 11px "IBM Plex Mono",monospace;fill:var(--muted);letter-spacing:.03em}
+  .tl-acc{fill:var(--accent)}
+  .t-own{fill:var(--own)}.t-bor{fill:var(--borrowed)}.t-nei{fill:var(--neither)}
+  .a{fill:none;stroke:currentColor;stroke-width:1.3}
+  .a-acc{fill:none;stroke:var(--accent);stroke-width:1.9}
+  .a-dash{stroke-dasharray:5 4}
+  .cap{font:500 10.5px "IBM Plex Mono",monospace;fill:var(--muted);letter-spacing:.14em}
+
+  .tbl{width:100%;border-collapse:collapse;margin-top:30px;font-size:14.5px}
+  .tbl th{
+    text-align:left;font:500 10.5px "IBM Plex Mono",monospace;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+    padding:0 16px 10px 0;border-bottom:1px solid var(--ink);vertical-align:bottom;
+  }
+  .tbl td{padding:13px 16px 13px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+  .tbl td:first-child{font:500 13px/1.5 "IBM Plex Mono",monospace;white-space:nowrap}
+  .tbl td:last-child{padding-right:0}
+  .pill{
+    display:inline-block;font:500 10.5px/1 "IBM Plex Mono",monospace;
+    letter-spacing:.08em;text-transform:uppercase;padding:5px 8px;border-radius:2px;
+    border:1px solid currentColor;white-space:nowrap;
+  }
+  .p-have{color:var(--own)}
+  .p-adapt{color:var(--borrowed)}
+  .p-new{color:var(--neither)}
+
+  .keylist{list-style:none;padding:0;margin:24px 0 0;display:grid;gap:16px}
+  @media (min-width:800px){.keylist{grid-template-columns:repeat(3,1fr);gap:24px}}
+  .keylist li{border-left:2px solid var(--line);padding-left:15px;font-size:14.5px;line-height:1.55}
+  .keylist li b{
+    display:block;font:500 11px "IBM Plex Mono",monospace;
+    letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;
+  }
+  .k-own{border-left-color:var(--own)}
+  .k-own b{color:var(--own)}
+  .k-bor{border-left-color:var(--borrowed)}
+  .k-bor b{color:var(--borrowed)}
+  .k-nei{border-left-color:var(--neither)}
+  .k-nei b{color:var(--neither)}
+
+  footer{margin-top:60px;padding-top:22px;border-top:1px solid var(--rule);font-size:13px;color:var(--muted)}
+  a{color:var(--accent)}
+  a:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+</style>
+
+<div class="wrap">
+
+<header class="mast">
+  <div class="eyebrow">Architecture sketch · polyx</div>
+  <h1>An expert system<br><span class="dim">that mines itself</span></h1>
+  <p class="thesis">polyx reads the journal an agent already writes, synthesises rules whose support is measured against that same history, and hands the ones with own evidence to a gate. The gate's overridden denials are the only labelled counterexamples in the system — which is what lets a rule be retired rather than merely accumulated.</p>
+  <div class="metastrip">
+    <span>29 Aug 2026</span>
+    <span>Built on polyness · polyflow · polygen</span>
+    <span>Pilot domain: banking CRM</span>
+  </div>
+</header>
+
+<section>
+  <div class="eyebrow">The loop</div>
+  <h2>Four moves, and a return path that carries labels</h2>
+  <p class="lede">Everything else here is detail inside one of these five boxes. What makes it a system rather than a pipeline is the vertical edge: enforcement produces the one kind of evidence mining cannot generate for itself.</p>
+
+  <figure>
+    <div class="scroller">
+      <svg viewBox="0 0 1000 440" role="img" aria-label="A closed loop: an agent at work writes a journal; a miner reads it and measures support; rules with own evidence enter a rule base; admitted invariants reach a gate; the gate permits, denies or advises the agent; and every overridden denial returns to the miner as a labelled false positive.">
+        <defs>
+          <marker id="ar1" viewBox="0 0 10 8" refX="9" refY="4" markerWidth="8" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 L10 4 L0 8 z" fill="currentColor"/>
+          </marker>
+          <marker id="ar1a" viewBox="0 0 10 8" refX="9" refY="4" markerWidth="8" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 L10 4 L0 8 z" fill="var(--accent)"/>
+          </marker>
+        </defs>
+
+        <text class="cap" x="40" y="32">EXECUTION</text>
+
+        <rect class="bx" x="40" y="60" width="180" height="82" rx="3"/>
+        <text class="t"  x="130" y="94"  text-anchor="middle">Agent at work</text>
+        <text class="ts" x="130" y="114" text-anchor="middle">executes the mandate,</text>
+        <text class="ts" x="130" y="130" text-anchor="middle">unchecked, as today</text>
+
+        <rect class="bx" x="270" y="60" width="180" height="82" rx="3"/>
+        <text class="t"  x="360" y="94"  text-anchor="middle">Journal</text>
+        <text class="ts" x="360" y="114" text-anchor="middle">every tool call, typed;</text>
+        <text class="ts" x="360" y="130" text-anchor="middle">opened read-only</text>
+
+        <rect class="bx" x="500" y="60" width="180" height="82" rx="3"/>
+        <text class="t"  x="590" y="94"  text-anchor="middle">Miner</text>
+        <text class="ts" x="590" y="114" text-anchor="middle">synthesise, then</text>
+        <text class="ts" x="590" y="130" text-anchor="middle">measure support</text>
+
+        <rect class="bx bx-own" x="730" y="60" width="180" height="82" rx="3"/>
+        <text class="t"  x="820" y="94"  text-anchor="middle">Rule base</text>
+        <text class="ts" x="820" y="114" text-anchor="middle">own · borrowed</text>
+        <text class="ts" x="820" y="130" text-anchor="middle">· neither</text>
+
+        <rect class="bx" x="500" y="300" width="180" height="82" rx="3"/>
+        <text class="t"  x="590" y="334" text-anchor="middle">Gate</text>
+        <text class="ts" x="590" y="354" text-anchor="middle">checks one run,</text>
+        <text class="ts" x="590" y="370" text-anchor="middle">before the effect</text>
+
+        <path class="a" d="M220 101 H262" marker-end="url(#ar1)"/>
+        <text class="tl" x="241" y="88" text-anchor="middle">writes</text>
+
+        <path class="a" d="M450 101 H492" marker-end="url(#ar1)"/>
+        <text class="tl" x="471" y="88" text-anchor="middle">reads</text>
+
+        <path class="a" d="M680 101 H722" marker-end="url(#ar1)"/>
+        <text class="tl" x="701" y="88" text-anchor="middle">proposes</text>
+
+        <path class="a" d="M820 142 V341 H688" marker-end="url(#ar1)"/>
+        <text class="tl" x="836" y="236" text-anchor="start">admitted</text>
+        <text class="tl" x="836" y="252" text-anchor="start">invariants only</text>
+
+        <path class="a" d="M500 341 H130 V150" marker-end="url(#ar1)"/>
+        <text class="tl" x="312" y="330" text-anchor="middle">permit · deny · advise</text>
+
+        <path class="a-acc" d="M590 300 V150" marker-end="url(#ar1a)"/>
+        <text class="tl tl-acc" x="606" y="208" text-anchor="start">an overridden denial</text>
+        <text class="tl tl-acc" x="606" y="224" text-anchor="start">is a labelled</text>
+        <text class="tl tl-acc" x="606" y="240" text-anchor="start">false positive</text>
+
+        <text class="cap" x="40" y="418">CONTROL</text>
+      </svg>
+    </div>
+    <figcaption><b>Figure 1 — the closed loop.</b> The horizontal path is ordinary experience-to-artifact learning; every system in the literature has some version of it. The accent edge is what most of them lack. A rule that fires can be wrong, and only a person overriding its denial ever says so — without that edge, a rule base can only grow.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <div class="eyebrow">Components</div>
+  <h2>Inside the miner</h2>
+  <p class="lede">The chain below is polyness as built, with module names as they appear on disk. Two things in it are load-bearing and easy to miss: the alphabet is settled before any number is computed, and provenance governs what may be <em>proposed</em> without limiting what may be <em>scored</em>.</p>
+
+  <figure>
+    <div class="scroller">
+      <svg viewBox="0 0 1060 640" role="img" aria-label="Pipeline detail: reader, normalise, episodes and subjects form the intake chain, with corrections feeding normalise; rules and provenance synthesise and classify; provenance fans out into own, borrowed and neither; only own-evidence rules continue to propose, polygen and the polyflow gate, whose journal returns to the reader. Borrowed and neither rules reach replay, which scores without proposing.">
+        <defs>
+          <marker id="ar2" viewBox="0 0 10 8" refX="9" refY="4" markerWidth="8" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 L10 4 L0 8 z" fill="currentColor"/>
+          </marker>
+          <marker id="ar2a" viewBox="0 0 10 8" refX="9" refY="4" markerWidth="8" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 L10 4 L0 8 z" fill="var(--accent)"/>
+          </marker>
+        </defs>
+
+        <text class="cap" x="40" y="52">INTAKE — WHAT COUNTS AS AN EVENT</text>
+
+        <rect class="bx" x="40" y="70" width="200" height="62" rx="3"/>
+        <text class="tm" x="140" y="96"  text-anchor="middle">reader.mjs</text>
+        <text class="ts" x="140" y="116" text-anchor="middle">journals in, lines out</text>
+
+        <rect class="bx" x="290" y="70" width="200" height="62" rx="3"/>
+        <text class="tm" x="390" y="96"  text-anchor="middle">normalise.mjs</text>
+        <text class="ts" x="390" y="116" text-anchor="middle">alphabet · redaction</text>
+
+        <rect class="bx" x="540" y="70" width="200" height="62" rx="3"/>
+        <text class="tm" x="640" y="96"  text-anchor="middle">episodes.mjs</text>
+        <text class="ts" x="640" y="116" text-anchor="middle">a session is not a task</text>
+
+        <rect class="bx" x="790" y="70" width="200" height="62" rx="3"/>
+        <text class="tm" x="890" y="96"  text-anchor="middle">subjects.mjs</text>
+        <text class="ts" x="890" y="116" text-anchor="middle">consequential only</text>
+
+        <path class="a" d="M240 101 H282" marker-end="url(#ar2)"/>
+        <path class="a" d="M490 101 H532" marker-end="url(#ar2)"/>
+        <path class="a" d="M740 101 H782" marker-end="url(#ar2)"/>
+
+        <rect class="bx bx-soft" x="290" y="168" width="200" height="46" rx="3"/>
+        <text class="tm" x="390" y="188" text-anchor="middle">corrections.mjs</text>
+        <text class="ts" x="390" y="205" text-anchor="middle">what verifies HERE</text>
+        <path class="a" d="M390 168 V140" marker-end="url(#ar2)"/>
+        <text class="tl" x="504" y="195" text-anchor="start">the alphabet, settled first</text>
+
+        <text class="cap" x="40" y="256">SYNTHESIS — WHAT COUNTS AS A RULE</text>
+
+        <rect class="bx" x="290" y="272" width="200" height="62" rx="3"/>
+        <text class="tm" x="390" y="298" text-anchor="middle">rules.mjs</text>
+        <text class="ts" x="390" y="318" text-anchor="middle">4 patterns × support</text>
+
+        <rect class="bx" x="540" y="272" width="200" height="62" rx="3"/>
+        <text class="tm" x="640" y="298" text-anchor="middle">provenance.mjs</text>
+        <text class="ts" x="640" y="318" text-anchor="middle">whose norm is this?</text>
+
+        <path class="a" d="M890 132 V240 H390 V264" marker-end="url(#ar2)"/>
+        <text class="tl" x="700" y="231" text-anchor="middle">instances, plus the two windows a rule can be measured over</text>
+
+        <path class="a" d="M490 303 H532" marker-end="url(#ar2)"/>
+
+        <path class="a" d="M640 334 V376"/>
+        <path class="a" d="M185 376 H855"/>
+        <path class="a" d="M185 376 V400" marker-end="url(#ar2)"/>
+        <path class="a" d="M520 376 V400" marker-end="url(#ar2)"/>
+        <path class="a" d="M855 376 V400" marker-end="url(#ar2)"/>
+
+        <rect class="bx bx-own" x="40" y="402" width="290" height="72" rx="3"/>
+        <text class="t t-own" x="185" y="428" text-anchor="middle">own evidence</text>
+        <text class="ts" x="185" y="448" text-anchor="middle">proposed by default,</text>
+        <text class="ts" x="185" y="464" text-anchor="middle">with its exceptions listed</text>
+
+        <rect class="bx bx-bor" x="375" y="402" width="290" height="72" rx="3"/>
+        <text class="t t-bor" x="520" y="428" text-anchor="middle">borrowed</text>
+        <text class="ts" x="520" y="448" text-anchor="middle">shown on request only —</text>
+        <text class="ts" x="520" y="464" text-anchor="middle">it is somebody else's norm</text>
+
+        <rect class="bx bx-nei" x="710" y="402" width="290" height="72" rx="3"/>
+        <text class="t t-nei" x="855" y="428" text-anchor="middle">neither</text>
+        <text class="ts" x="855" y="448" text-anchor="middle">never proposed, at any</text>
+        <text class="ts" x="855" y="464" text-anchor="middle">confidence — still scoreable</text>
+
+        <text class="cap" x="40" y="518">EMISSION — WHAT COUNTS AS ENFORCEABLE</text>
+
+        <path class="a" d="M185 474 V508 H130 V530" marker-end="url(#ar2)"/>
+
+        <rect class="bx" x="40" y="532" width="180" height="62" rx="3"/>
+        <text class="tm" x="130" y="558" text-anchor="middle">propose.mjs</text>
+        <text class="ts" x="130" y="578" text-anchor="middle">contract + invariants</text>
+
+        <rect class="bx" x="270" y="532" width="180" height="62" rx="3"/>
+        <text class="tm" x="360" y="558" text-anchor="middle">polygen</text>
+        <text class="ts" x="360" y="578" text-anchor="middle">authors the machine</text>
+
+        <rect class="bx bx-own" x="500" y="532" width="180" height="62" rx="3"/>
+        <text class="tm" x="590" y="558" text-anchor="middle">polyflow gate</text>
+        <text class="ts" x="590" y="578" text-anchor="middle">admits · denies</text>
+
+        <path class="a" d="M220 563 H262" marker-end="url(#ar2)"/>
+        <path class="a" d="M450 563 H492" marker-end="url(#ar2)"/>
+
+        <rect class="bx bx-nei" x="710" y="532" width="290" height="62" rx="3"/>
+        <text class="tm" x="855" y="558" text-anchor="middle">replay.mjs</text>
+        <text class="ts" x="855" y="578" text-anchor="middle">scores, and notices staleness</text>
+
+        <path class="a a-dash" d="M855 474 V524" marker-end="url(#ar2)"/>
+        <path class="a a-dash" d="M520 474 V502 H790 V524" marker-end="url(#ar2)"/>
+
+        <path class="a-acc a-dash" d="M590 594 V616 H1032 V30 H140 V62" marker-end="url(#ar2a)"/>
+        <text class="tl tl-acc" x="1024" y="497" text-anchor="end">gate journal —</text>
+        <text class="tl tl-acc" x="1024" y="512" text-anchor="end">allow · deny · override</text>
+      </svg>
+    </div>
+    <figcaption><b>Figure 2 — the miner, module by module.</b> <code>thresholds.mjs</code> supplies the floors that <code>rules.mjs</code> and <code>provenance.mjs</code> read; it is configuration rather than dataflow, so it is not drawn. The accent return is what turns this pipeline into the loop of Figure 1 — the gate writes a journal in the same shape the reader consumes, so enforcement becomes intake on the next pass.</figcaption>
+  </figure>
+
+  <ul class="keylist">
+    <li class="k-own"><b>own</b>Holds in at least 60% of this project's own instances. A proposal is a normative act, and this is the only branch entitled to make one.</li>
+    <li class="k-bor"><b>borrowed</b>Fails here, holds in three or more other projects. Shown when asked for, never by default — otherwise the tool imports an opinion under the appearance of a finding.</li>
+    <li class="k-nei"><b>neither</b>No support anywhere in the corpus. Refused as a proposal at any confidence, and still fully scoreable, because proposing is a claim and scoring is an observation.</li>
+  </ul>
+</section>
+
+<section>
+  <div class="eyebrow">Instantiation · banking CRM</div>
+  <h2>Two rule families that must not be confused</h2>
+  <p class="lede">The dev-tool domain has one kind of rule: a constraint on a step you cannot take back. A CRM has two, and they need different evidence standards and different fates. Collapsing them is how a recommender ends up enforcing, and how an obligation ends up as a suggestion.</p>
+
+  <figure>
+    <div class="scroller">
+      <svg viewBox="0 0 1000 500" role="img" aria-label="Banking CRM instantiation: interaction traces feed the polyx pipeline, which produces obligation rules that compile to a gate and recommendation rules that feed an advisor. The gate permits or denies the CRM agent; the advisor either recommends or abstains, handing the decision to LLM inference. Actions and outcomes accumulate in an outcome ledger that returns to the pipeline as labels.">
+        <defs>
+          <marker id="ar3" viewBox="0 0 10 8" refX="9" refY="4" markerWidth="8" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 L10 4 L0 8 z" fill="currentColor"/>
+          </marker>
+          <marker id="ar3a" viewBox="0 0 10 8" refX="9" refY="4" markerWidth="8" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 L10 4 L0 8 z" fill="var(--accent)"/>
+          </marker>
+        </defs>
+
+        <rect class="bx" x="40" y="54" width="190" height="60" rx="3"/>
+        <text class="t"  x="135" y="80" text-anchor="middle">Interaction traces</text>
+        <text class="ts" x="135" y="99" text-anchor="middle">reps and agents alike</text>
+
+        <rect class="bx" x="280" y="54" width="190" height="60" rx="3"/>
+        <text class="t"  x="375" y="80" text-anchor="middle">polyx pipeline</text>
+        <text class="ts" x="375" y="99" text-anchor="middle">Figure 2, unchanged</text>
+
+        <path class="a" d="M230 84 H272" marker-end="url(#ar3)"/>
+
+        <rect class="bx bx-own" x="520" y="20" width="190" height="60" rx="3"/>
+        <text class="t t-own" x="615" y="45" text-anchor="middle">Obligation rules</text>
+        <text class="ts" x="615" y="64" text-anchor="middle">never quote without disclosure</text>
+
+        <rect class="bx bx-bor" x="520" y="130" width="190" height="60" rx="3"/>
+        <text class="t t-bor" x="615" y="155" text-anchor="middle">Recommendation rules</text>
+        <text class="ts" x="615" y="174" text-anchor="middle">if state ∧ context → offer P</text>
+
+        <path class="a" d="M470 74 H496 V50 H512" marker-end="url(#ar3)"/>
+        <path class="a" d="M470 94 H496 V160 H512" marker-end="url(#ar3)"/>
+
+        <rect class="bx bx-own" x="770" y="20" width="190" height="60" rx="3"/>
+        <text class="t"  x="865" y="45" text-anchor="middle">Gate</text>
+        <text class="ts" x="865" y="64" text-anchor="middle">blocks before the effect</text>
+
+        <rect class="bx bx-bor" x="770" y="130" width="190" height="60" rx="3"/>
+        <text class="t"  x="865" y="155" text-anchor="middle">Advisor</text>
+        <text class="ts" x="865" y="174" text-anchor="middle">fires, or abstains</text>
+
+        <path class="a" d="M710 50 H762"  marker-end="url(#ar3)"/>
+        <path class="a" d="M710 160 H762" marker-end="url(#ar3)"/>
+
+        <rect class="bx" x="280" y="250" width="190" height="72" rx="3"/>
+        <text class="t"  x="375" y="282" text-anchor="middle">CRM agent</text>
+        <text class="ts" x="375" y="302" text-anchor="middle">customer-facing</text>
+
+        <rect class="bx" x="520" y="250" width="190" height="72" rx="3"/>
+        <text class="t"  x="615" y="282" text-anchor="middle">LLM inference</text>
+        <text class="ts" x="615" y="302" text-anchor="middle">the uncovered tail</text>
+
+        <path class="a" d="M960 50 H986 V214 H375 V242" marker-end="url(#ar3)"/>
+        <text class="tl" x="600" y="206" text-anchor="middle">permit · deny — enforcement is obligations only</text>
+
+        <path class="a a-dash" d="M800 190 V232 H615 V242" marker-end="url(#ar3)"/>
+        <text class="tl" x="810" y="212" text-anchor="start">abstains</text>
+
+        <path class="a" d="M770 190 V360 H430 V330" marker-end="url(#ar3)"/>
+        <text class="tl" x="540" y="352" text-anchor="middle">recommends</text>
+
+        <path class="a" d="M512 286 H478" marker-end="url(#ar3)"/>
+        <text class="tl" x="495" y="268" text-anchor="middle">answers</text>
+
+        <rect class="bx" x="280" y="400" width="430" height="60" rx="3"/>
+        <text class="t"  x="495" y="425" text-anchor="middle">Outcome ledger</text>
+        <text class="ts" x="495" y="444" text-anchor="middle">accepted · declined · complaint · churn, at 90 days</text>
+
+        <path class="a" d="M330 322 V392" marker-end="url(#ar3)"/>
+        <path class="a" d="M615 322 V392" marker-end="url(#ar3)"/>
+
+        <path class="a-acc a-dash" d="M280 430 H245 V92 H272" marker-end="url(#ar3a)"/>
+        <text class="tl tl-acc" x="236" y="262" text-anchor="end">labels</text>
+      </svg>
+    </div>
+    <figcaption><b>Figure 3 — the CRM instantiation.</b> The gate may enforce obligations and nothing else; recommendations are advisory and always abstainable. That constraint is what makes coverage a measurable quantity — the share of decisions the rule base answers, against the share still handed to inference. It should rise over time, and it is the same number that turns a fired rule into inference not paid for.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <div class="eyebrow">Month-one deliverable</div>
+  <h2>Policy archaeology, before any agent is deployed</h2>
+  <p class="lede">The mined rule set and the written policy manual are two descriptions of the same institution, and they disagree. Diffing them is a compliance product that needs no agent-assist story at all — and it is the <span class="mono">own / borrowed / neither</span> verdict wearing a different hat.</p>
+
+  <figure>
+    <div class="scroller">
+      <svg viewBox="0 0 680 330" role="img" aria-label="Two overlapping sets. The mined set alone holds rules followed but never written down; the overlap holds confirmed policy that holds in practice; the written set alone holds policy that is written but not followed.">
+        <circle cx="262" cy="162" r="120" fill="none" stroke="var(--own)" stroke-width="1.8"/>
+        <circle cx="418" cy="162" r="120" fill="none" stroke="var(--neither)" stroke-width="1.8"/>
+
+        <text class="tl t-own" x="176" y="32" text-anchor="middle">MINED</text>
+        <text class="ts t-own" x="176" y="49" text-anchor="middle">what reps actually do</text>
+        <text class="tl t-nei" x="504" y="32" text-anchor="middle">WRITTEN</text>
+        <text class="ts t-nei" x="504" y="49" text-anchor="middle">what the manual says</text>
+
+        <text class="t"  x="188" y="152" text-anchor="middle">Tribal</text>
+        <text class="t"  x="188" y="172" text-anchor="middle">knowledge</text>
+        <text class="ts" x="188" y="194" text-anchor="middle">worth capturing</text>
+
+        <text class="t"  x="340" y="154" text-anchor="middle">Confirmed</text>
+        <text class="ts" x="340" y="176" text-anchor="middle">policy that</text>
+        <text class="ts" x="340" y="192" text-anchor="middle">holds</text>
+
+        <text class="t"  x="492" y="152" text-anchor="middle">Compliance</text>
+        <text class="t"  x="492" y="172" text-anchor="middle">gap</text>
+        <text class="ts" x="492" y="194" text-anchor="middle">written, not kept</text>
+
+        <text class="ts" x="340" y="314" text-anchor="middle">— and rules that contradict each other, found inside the mined set by replay —</text>
+      </svg>
+    </div>
+    <figcaption><b>Figure 4 — the diff a risk committee can read.</b> Three findings fall out of one comparison, and each has a different owner: the left region is knowledge management, the overlap is validation, the right region is a control failure. None of them requires deploying an agent, which is why this is the first thing to build with a bank partner rather than the last.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <div class="eyebrow">Delta</div>
+  <h2>What exists, and what polyx has to add</h2>
+  <p class="lede">polyness already implements most of Figure 2 against Claude Code journals. The honest gap is everything the CRM domain makes contestable — the alphabet, the notion of consequence, and outcomes that arrive months late.</p>
+
+  <table class="tbl">
+    <thead>
+      <tr><th>Component</th><th>Status</th><th>What changes for polyx</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>reader</td>
+        <td><span class="pill p-adapt">adapt</span></td>
+        <td>Reads Claude Code journals only. Targeting the Agent Data Protocol schema makes the reader an interface rather than an aspiration, and 1.3M public trajectories become readable without a new parser.</td>
+      </tr>
+      <tr>
+        <td>normalise<br>corrections</td>
+        <td><span class="pill p-new">rebuild</span></td>
+        <td>The largest change. A shell command is self-describing; a customer interaction is not. The alphabet has to be built from intents, entities and outcomes — and this is the module that decides whether every number downstream is right.</td>
+      </tr>
+      <tr>
+        <td>episodes</td>
+        <td><span class="pill p-have">have</span></td>
+        <td>Run-versus-session windowing carries over directly. Robotic process mining has been solving the same segmentation problem since 2019 and is worth mining for technique.</td>
+      </tr>
+      <tr>
+        <td>subjects</td>
+        <td><span class="pill p-adapt">adapt</span></td>
+        <td>Consequence is a closed, obvious set in the dev domain and a graded, contested one in a bank. Populating it is a domain-expert task, not an engineering one.</td>
+      </tr>
+      <tr>
+        <td>rules</td>
+        <td><span class="pill p-adapt">adapt</span></td>
+        <td>The four patterns are DECLARE templates under other names, so the constraint family has fifteen years of formal semantics behind it. Recommendation rules are a second, classifier-shaped family the table does not yet cover.</td>
+      </tr>
+      <tr>
+        <td>provenance</td>
+        <td><span class="pill p-adapt">adapt</span></td>
+        <td>Three levels become four or more: this rep, this team, this bank, this regulator. Worth designing before a pilot rather than after.</td>
+      </tr>
+      <tr>
+        <td>propose<br>polygen<br>gate</td>
+        <td><span class="pill p-have">have</span></td>
+        <td>The predicate vocabulary already sits inside the runtime-enforceable fragment — a pre-execution gate can enforce safety properties and nothing else, and <span class="mono">path.count</span> and <span class="mono">path.actionBefore</span> are the right shape by luck as much as by design.</td>
+      </tr>
+      <tr>
+        <td>advisor<br>abstention</td>
+        <td><span class="pill p-new">new</span></td>
+        <td>No counterpart in polyness, because the dev domain has no advisory rules. Abstention semantics are what let a rule base cover what it has evidence for and hand back the rest honestly.</td>
+      </tr>
+      <tr>
+        <td>outcome ledger</td>
+        <td><span class="pill p-new">new</span></td>
+        <td>Turns outcome classification from a heuristic into a supervised signal, and makes counterexample-guided refinement viable. Delayed by roughly 90 days, which the mining schedule has to absorb.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="cols">
+    <p><strong>The risk to design around.</strong> Once the gate starts denying, the journal is generated under enforcement, and the support figures that justified a rule stop describing the world the gate now sees. Offline scores do not predict closed-loop behaviour. The likely mitigation is a held-out unenforced arm — a slice of traffic the gate observes but never blocks — which costs something real and should be priced into the pilot rather than discovered in month four.</p>
+    <p><strong>The threshold problem.</strong> Every floor in <code>thresholds.mjs</code> was set from one corpus and is pinned by a test against that same corpus, which is circular, and the code says so in its own comment. A second domain is the only cure. That argues for running the CRM pilot early, and for treating its first thresholds as provisional rather than tuned.</p>
+  </div>
+</section>
+
+<footer>
+  Companion to <span class="mono">docs/polyx-literature-review.md</span>. Module names are polyness as built; polygen and the polyflow gate are existing components of the Poly stack. Figures 3 and 4 are proposed design, not implemented.
+</footer>
+
+</div>

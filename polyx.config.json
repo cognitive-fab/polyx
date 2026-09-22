@@ -1,0 +1,78 @@
+{
+  "workspace": ".polyx",
+  "policies": [
+    "../polyx-bench/policies",
+    "../polyx-eval/policies"
+  ],
+  "segmenter": "null",
+  "seed": 1,
+  "corpora": {
+    "synthetic": {
+      "adapter": "synthetic",
+      "source": "fixture:synthetic/synthetic.json",
+      "alphabet": "alphabet.synthetic.yaml",
+      "policy": "fixture:synthetic/synthetic-policy.yaml"
+    },
+    "synthetic-observable": {
+      "adapter": "synthetic",
+      "source": "fixture:synthetic-observable/synthetic-observable.json",
+      "alphabet": "alphabet.synthetic.yaml"
+    },
+    "abcd": {
+      "adapter": "abcd",
+      "source": "corpora/abcd/abcd_v1.1.json",
+      "alphabet": "alphabet.abcd.yaml"
+    },
+    "tau2-retail": {
+      "adapter": "tau2",
+      "source": "corpora/tau2-src/data/tau2/results/final/claude-3-7-sonnet-20250219_retail_default_gpt-4.1-2025-04-14_4trials.json",
+      "alphabet": "alphabet.tau2-retail.yaml",
+      "domain": "tau2:retail"
+    },
+    "tau2-retail-gpt41": {
+      "adapter": "tau2",
+      "source": "corpora/tau2-src/data/tau2/results/final/gpt-4.1-2025-04-14_retail_default_gpt-4.1-2025-04-14_4trials.json",
+      "alphabet": "alphabet.tau2-retail.yaml",
+      "domain": "tau2:retail"
+    },
+    "tau2-retail-o4mini": {
+      "adapter": "tau2",
+      "source": "corpora/tau2-src/data/tau2/results/final/o4-mini-2025-04-16_retail_default_gpt-4.1-2025-04-14_4trials.json",
+      "alphabet": "alphabet.tau2-retail.yaml",
+      "domain": "tau2:retail"
+    },
+    "tau2-retail-gpt41mini": {
+      "adapter": "tau2",
+      "source": "corpora/tau2-src/data/tau2/results/final/gpt-4.1-mini-2025-04-14_retail_base_gpt-4.1-2025-04-14_4trials.json",
+      "alphabet": "alphabet.tau2-retail.yaml",
+      "domain": "tau2:retail"
+    },
+    "tau2-retail-all": {
+      "adapter": "tau2",
+      "source": "corpora/tau2/retail-all",
+      "alphabet": "alphabet.tau2-retail.yaml",
+      "domain": "tau2:retail"
+    },
+    "cc": {
+      "adapter": "cc",
+      "source": "corpora/cc",
+      "alphabet": "alphabet.cc.yaml",
+      "segmenter": "polyness",
+      "policy": "cc-policy.yaml",
+      "domain": "claude-code"
+    },
+    "cc-mimo": {
+      "adapter": "cc",
+      "source": "corpora/mimo-src/session",
+      "alphabet": "alphabet.cc.yaml",
+      "segmenter": "polyness",
+      "policy": "cc-policy.yaml",
+      "domain": "claude-code"
+    },
+    "bpic2017": {
+      "adapter": "bpic",
+      "source": "corpora/bpic2017/BPI Challenge 2017.xes.gz",
+      "alphabet": "alphabet.bpic2017.yaml"
+    }
+  }
+}

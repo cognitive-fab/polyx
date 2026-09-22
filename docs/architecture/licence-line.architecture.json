@@ -1,0 +1,274 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Where does the licence boundary run?",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/cognitive-fab/polyx",
+      "revision": "9fb805bbd68483f4417a1c7fec4c24328f64bf8f"
+    },
+    "views": [
+      {
+        "id": "answer",
+        "label": "Where does the licence boundary run?",
+        "focus": [
+          "miner",
+          "pipeline"
+        ],
+        "note": "The free half is the whole front of the system — record, alphabet, adapters, ports, pipeline and the report. The paid half is everything th…"
+      },
+      {
+        "id": "free",
+        "label": "polyx-lens — free",
+        "focus": [
+          "pipeline",
+          "ports"
+        ],
+        "note": "Everything here runs without buying anything, imports nothing from the paid half, and can make no network call under any configuration — th…"
+      },
+      {
+        "id": "paid",
+        "label": "polyx — BUSL 1.1",
+        "focus": [
+          "miner",
+          "store"
+        ],
+        "note": "Source-available, internal use granted, Apache-2.0 in four years: the half that turns a corpus into rules nobody wrote down, and the half t…"
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "polyness",
+      "type": "external",
+      "label": "polyness",
+      "pos": [
+        60,
+        48
+      ],
+      "size": [
+        150,
+        62
+      ],
+      "sublabel": "vendored, Apache-2.0"
+    },
+    {
+      "id": "ports",
+      "type": "backend",
+      "label": "Ports",
+      "pos": [
+        60,
+        167
+      ],
+      "size": [
+        150,
+        62
+      ],
+      "sublabel": "five ports, two impls each"
+    },
+    {
+      "id": "pipeline",
+      "type": "backend",
+      "label": "Pipeline",
+      "pos": [
+        60,
+        248
+      ],
+      "size": [
+        150,
+        62
+      ],
+      "sublabel": "loadCorpus"
+    },
+    {
+      "id": "miner",
+      "type": "backend",
+      "label": "Miner",
+      "pos": [
+        700,
+        366
+      ],
+      "size": [
+        150,
+        62
+      ],
+      "sublabel": "patterns, provenance",
+      "sources": [
+        {
+          "path": "src/mine/index.ts",
+          "label": "mine()"
+        },
+        {
+          "path": "src/mine/patterns.ts",
+          "label": "the pattern table"
+        },
+        {
+          "path": "src/mine/facts.ts",
+          "label": "a withheld observation is evidence"
+        }
+      ]
+    },
+    {
+      "id": "store",
+      "type": "database",
+      "label": "Store",
+      "pos": [
+        1020,
+        366
+      ],
+      "size": [
+        150,
+        62
+      ],
+      "sublabel": "SQLite, derived only",
+      "sources": [
+        {
+          "path": "src/store/db.ts",
+          "label": "schema and migrations"
+        },
+        {
+          "path": "src/store/rules.ts",
+          "label": "verdicts survive re-mining"
+        }
+      ]
+    },
+    {
+      "id": "jev",
+      "type": "external",
+      "label": "Jev adapter",
+      "pos": [
+        380,
+        48
+      ],
+      "size": [
+        150,
+        62
+      ],
+      "sublabel": "MIT; the only network code",
+      "sources": [
+        {
+          "path": "src/ports/jev/client.ts",
+          "label": "bearer, timeout, backoff on 429/529"
+        },
+        {
+          "path": "src/ports/jev/observer.ts",
+          "label": "the Observer implementation"
+        },
+        {
+          "path": "src/ports/jev/LICENSE",
+          "label": "MIT, carved out of the BUSL grant"
+        }
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "security-group",
+      "label": "polyx-lens — free",
+      "wraps": [
+        "pipeline",
+        "ports"
+      ],
+      "pad": 20
+    },
+    {
+      "kind": "security-group",
+      "label": "polyx — BUSL 1.1",
+      "wraps": [
+        "miner",
+        "store"
+      ],
+      "pad": 20
+    }
+  ],
+  "connections": [
+    {
+      "from": "polyness",
+      "to": "ports",
+      "label": "one implementation of each",
+      "labelAt": [
+        135,
+        127
+      ]
+    },
+    {
+      "from": "ports",
+      "to": "pipeline",
+      "label": "episode ids",
+      "labelAt": [
+        135,
+        243
+      ]
+    },
+    {
+      "from": "pipeline",
+      "to": "miner",
+      "label": "typed interactions",
+      "fromSide": "bottom",
+      "toSide": "bottom",
+      "via": [
+        [
+          135,
+          640
+        ],
+        [
+          775,
+          640
+        ]
+      ],
+      "labelAt": [
+        455,
+        427
+      ],
+      "variant": "security"
+    },
+    {
+      "from": "ports",
+      "to": "miner",
+      "label": "instances, provenance level",
+      "labelAt": [
+        295,
+        177
+      ],
+      "variant": "security"
+    },
+    {
+      "from": "miner",
+      "to": "store",
+      "label": "rules with counter-evidence · SQL",
+      "labelAt": [
+        935,
+        376
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "The short answer",
+      "items": [
+        "The free half is the whole front of the system — record, alphabet, adapters, ports, pipeline and the report",
+        "The paid half is everything that turns a corpus into rules nobody wrote down",
+        "Exactly two edges cross, both from the free half into the paid one, and nothing crosses back: polyx depends on polyx-lens and polyx-lens imports nothing from polyx"
+      ]
+    },
+    {
+      "dot": "slate",
+      "title": "Not shown here",
+      "items": [
+        "The adapters, alphabet, contracts, checker and report sit inside the free half with the pipeline",
+        "the reviewer, advisor, evaluator and diff sit with the miner",
+        "the answer keys have a question of their own"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Constraints",
+      "items": [
+        "The free half imports nothing from the paid half — a licence split that is only written down is a promise; one that is a dependency direction can be checked by anybody who reads the build",
+        "An answer key is never distributed to anyone — a shipped answer key is a shipped evaluation, and the decompositions are months of judgement rather than code"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,496 @@
+{
+  "generatedBy": "scripts/reproduce.mjs",
+  "corpora": {
+    "synthetic": {
+      "corpusRevision": "c2f7c668dab546e1",
+      "alphabetVersion": 2,
+      "interactions": 46,
+      "events": 366,
+      "unknownRate": 0.01092896174863388,
+      "rules": {
+        "proposed": 13,
+        "refused": 5,
+        "suppressed": 23,
+        "contradicted": 4,
+        "recommendations": 6,
+        "decisionPoints": 46
+      },
+      "evaluation": {
+        "policyRevision": "311bb9ee01f095f3",
+        "clauses": {
+          "total": 6,
+          "expressible": 5,
+          "inexpressible": 1,
+          "expressibleAdjacent": null,
+          "byReason": {
+            "free-text instruction": 1
+          }
+        },
+        "precision": {
+          "strict": 0.7142857142857143,
+          "lenient": 0.7142857142857143,
+          "alignable": 0.7142857142857143
+        },
+        "recall": {
+          "strict": 0.8,
+          "lenient": 0.8
+        },
+        "recallViolatedOnly": {
+          "strict": 0.75,
+          "lenient": 0.75,
+          "den": 4
+        },
+        "refusalCorrectness": 0.6,
+        "failedShare": 0.10869565217391304,
+        "gate": "between"
+      },
+      "diff": {
+        "tribal": 2,
+        "tribalExtended": 0,
+        "tribalNovel": 2,
+        "confirmed": 5,
+        "gap": {
+          "violated": 1,
+          "neverExercised": 0,
+          "keptNotMined": 0
+        },
+        "contradictions": 2,
+        "inexpressible": 1
+      },
+      "coverageCeiling": {
+        "coverage": 1,
+        "agreement": 1,
+        "outcomePrecision": 0.8913043478260869,
+        "cleared": 0,
+        "warned": 0.021739130434782608
+      }
+    },
+    "abcd": {
+      "corpusRevision": "005d425e890b30a1",
+      "alphabetVersion": 2,
+      "interactions": 10042,
+      "events": 220983,
+      "unknownRate": 0,
+      "rules": {
+        "proposed": 150,
+        "refused": 16,
+        "suppressed": 29,
+        "contradicted": 0,
+        "recommendations": 63,
+        "decisionPoints": 5174
+      },
+      "evaluation": {
+        "policyRevision": "7cd75c3efb42e226",
+        "clauses": {
+          "total": 499,
+          "expressible": 155,
+          "inexpressible": 344,
+          "expressibleAdjacent": 48,
+          "byReason": {
+            "subject is not a consequential action": 202,
+            "free-text instruction": 110,
+            "the guidelines free the order in this subflow: \"Choose these in any order.\"": 12,
+            "the guidelines free the order in this subflow: \"Option 1 … Option 5 — a menu of alternatives, not a sequence.\"": 10,
+            "the guidelines free the order in this subflow: \"Pick these actions in any order you wish. Feel free to be creative.\"": 10
+          }
+        },
+        "precision": {
+          "strict": 0.5287356321839081,
+          "lenient": 0.5747126436781609,
+          "alignable": 0.5747126436781609
+        },
+        "recall": {
+          "strict": 0.5290322580645161,
+          "lenient": 0.5548387096774193
+        },
+        "recallViolatedOnly": {
+          "strict": 0.5348837209302325,
+          "lenient": 0.5581395348837209,
+          "den": 129
+        },
+        "refusalCorrectness": 1,
+        "failedShare": 0.056462856004779925,
+        "gate": "between"
+      },
+      "diff": {
+        "tribal": 36,
+        "tribalExtended": 28,
+        "tribalNovel": 8,
+        "confirmed": 50,
+        "gap": {
+          "violated": 57,
+          "neverExercised": 2,
+          "keptNotMined": 10
+        },
+        "contradictions": 0,
+        "inexpressible": 344
+      },
+      "coverageCeiling": {
+        "coverage": 0.9213374565133359,
+        "agreement": 0.9154493138556884,
+        "outcomePrecision": 0.8803191489361702,
+        "cleared": 0.014302280633938926,
+        "warned": 0.2027444916892153
+      }
+    },
+    "tau2-retail": {
+      "corpusRevision": "8ed278ae09736e28",
+      "alphabetVersion": 2,
+      "interactions": 456,
+      "events": 13486,
+      "unknownRate": 0,
+      "rules": {
+        "proposed": 21,
+        "refused": 0,
+        "suppressed": 25,
+        "contradicted": 0,
+        "recommendations": 0,
+        "decisionPoints": 432
+      },
+      "evaluation": {
+        "policyRevision": "c270170ae81bd00a",
+        "clauses": {
+          "total": 27,
+          "expressible": 15,
+          "inexpressible": 12,
+          "expressibleAdjacent": null,
+          "byReason": {
+            "subject is not a consequential action": 1,
+            "guard is not an action": 1,
+            "needs a fact polyx does not carry": 1,
+            "needs a fact from a tool result": 4,
+            "needs a slot-value rule polyx does not mine": 1,
+            "shape polyx does not mine": 1,
+            "subject is not an action": 1,
+            "free-text instruction": 2
+          }
+        },
+        "precision": {
+          "strict": 0.5238095238095238,
+          "lenient": 0.5238095238095238,
+          "alignable": 0.5238095238095238
+        },
+        "recall": {
+          "strict": 0.7333333333333333,
+          "lenient": 0.7333333333333333
+        },
+        "recallViolatedOnly": {
+          "strict": 0,
+          "lenient": 0,
+          "den": 2
+        },
+        "refusalCorrectness": null,
+        "failedShare": 0.21271929824561403,
+        "gate": "between"
+      },
+      "diff": {
+        "tribal": 10,
+        "tribalExtended": 0,
+        "tribalNovel": 10,
+        "confirmed": 11,
+        "gap": {
+          "violated": 2,
+          "neverExercised": 0,
+          "keptNotMined": 2
+        },
+        "contradictions": 0,
+        "inexpressible": 12
+      },
+      "coverageCeiling": {
+        "coverage": 0.9907407407407407,
+        "agreement": null,
+        "outcomePrecision": null,
+        "cleared": 0.9444444444444444,
+        "warned": 0.046296296296296294
+      }
+    },
+    "tau2-retail-gpt41": {
+      "corpusRevision": "512df82cc0e95e65",
+      "alphabetVersion": 2,
+      "interactions": 456,
+      "events": 13164,
+      "unknownRate": 0,
+      "rules": {
+        "proposed": 21,
+        "refused": 0,
+        "suppressed": 26,
+        "contradicted": 0,
+        "recommendations": 0,
+        "decisionPoints": 423
+      },
+      "coverageCeiling": {
+        "coverage": 0.9905437352245863,
+        "agreement": null,
+        "outcomePrecision": null,
+        "cleared": 0.9527186761229315,
+        "warned": 0.037825059101654845
+      }
+    },
+    "tau2-retail-o4mini": {
+      "corpusRevision": "e9287afa8b499b79",
+      "alphabetVersion": 2,
+      "interactions": 456,
+      "events": 12818,
+      "unknownRate": 0,
+      "rules": {
+        "proposed": 22,
+        "refused": 0,
+        "suppressed": 23,
+        "contradicted": 0,
+        "recommendations": 0,
+        "decisionPoints": 424
+      },
+      "coverageCeiling": {
+        "coverage": 0.9905660377358491,
+        "agreement": null,
+        "outcomePrecision": null,
+        "cleared": 0.8985849056603774,
+        "warned": 0.09198113207547169
+      }
+    },
+    "tau2-retail-gpt41mini": {
+      "corpusRevision": "a9d8827875713ce6",
+      "alphabetVersion": 2,
+      "interactions": 456,
+      "events": 14418,
+      "unknownRate": 0,
+      "rules": {
+        "proposed": 24,
+        "refused": 0,
+        "suppressed": 25,
+        "contradicted": 0,
+        "recommendations": 0,
+        "decisionPoints": 420
+      },
+      "coverageCeiling": {
+        "coverage": 1,
+        "agreement": null,
+        "outcomePrecision": null,
+        "cleared": 0.8976190476190476,
+        "warned": 0.10238095238095238
+      }
+    },
+    "tau2-retail-all": {
+      "corpusRevision": "bf98edab313e8749",
+      "alphabetVersion": 2,
+      "interactions": 1824,
+      "events": 53886,
+      "unknownRate": 0,
+      "rules": {
+        "proposed": 24,
+        "refused": 0,
+        "suppressed": 25,
+        "contradicted": 0,
+        "recommendations": 0,
+        "decisionPoints": 1699
+      },
+      "coverageCeiling": {
+        "coverage": 1,
+        "agreement": null,
+        "outcomePrecision": null,
+        "cleared": 0.9199529134785168,
+        "warned": 0.08004708652148322
+      }
+    },
+    "cc": {
+      "corpusRevision": "183965184f5abb6f",
+      "alphabetVersion": 5,
+      "interactions": 141,
+      "events": 111926,
+      "unknownRate": 0.035085681611064456,
+      "rules": {
+        "proposed": 2802,
+        "refused": 1708,
+        "suppressed": 1619,
+        "contradicted": 920,
+        "recommendations": 0,
+        "decisionPoints": 2123
+      },
+      "evaluation": {
+        "policyRevision": "67ba35ab540fd8b6",
+        "clauses": {
+          "total": 30,
+          "expressible": 15,
+          "inexpressible": 15,
+          "expressibleAdjacent": 12,
+          "byReason": {
+            "the subject is a property of the file being written — chart code — not a typed action": 1,
+            "the antecedent is a property of the prompt text, which the corpus does not persist": 1,
+            "conditional on intent (would a capability make the page more useful) and on an argument value (capabilities), neither of which is a typed action": 1,
+            "conditional on what the page contains; no typed action marks a diagram": 1,
+            "no type names a Workflow call — action:spawn_agent covers Agent and Workflow together, and the corpus has 0 Workflow calls to justify splitting it": 1,
+            "needs the operator's intent, which polyx does not carry": 1,
+            "guard and a destructive action share an event type — alphabet v2 puts `git checkout -b` and `git reset --hard` both in action:git_discard, so the clause cannot be stated without flag-level typing": 1,
+            "a flag on a command; the corpus deliberately does not persist command text": 1,
+            "a flag on a command": 1,
+            "the content of an argument, not an action": 1,
+            "a preference between two event types, which is not a shape polyx has": 1,
+            "the guard is an utterance, and the pattern table requires a guard to be an action": 1,
+            "not an action": 1,
+            "conditional on the content of a diff, which polyx does not carry": 1,
+            "a deferred tool is not an event type but a property of many — expressible one surface at a time (see cc-toolsearch-before-browser-drive), not as one clause": 1
+          }
+        },
+        "precision": {
+          "strict": 0.029978586723768737,
+          "lenient": 0.029978586723768737,
+          "alignable": 0.029989289539450195
+        },
+        "recall": {
+          "strict": 0.8666666666666667,
+          "lenient": 0.8666666666666667
+        },
+        "recallViolatedOnly": {
+          "strict": 0.8571428571428571,
+          "lenient": 0.8571428571428571,
+          "den": 14
+        },
+        "refusalCorrectness": 0.9894613583138173,
+        "failedShare": 0.06382978723404255,
+        "gate": "falsified"
+      },
+      "diff": {
+        "tribal": 2671,
+        "tribalExtended": 0,
+        "tribalNovel": 2671,
+        "confirmed": 84,
+        "gap": {
+          "violated": 2,
+          "neverExercised": 0,
+          "keptNotMined": 0
+        },
+        "contradictions": 460,
+        "inexpressible": 15
+      },
+      "coverageCeiling": {
+        "coverage": 0.9792746113989638,
+        "agreement": null,
+        "outcomePrecision": null,
+        "cleared": 0.0009420631182289214,
+        "warned": 0.9783325482807348
+      }
+    },
+    "cc-mimo": {
+      "corpusRevision": "4af0bded65d5ebc3",
+      "alphabetVersion": 5,
+      "interactions": 859,
+      "events": 14246,
+      "unknownRate": 0.005685806542187281,
+      "rules": {
+        "proposed": 117,
+        "refused": 132,
+        "suppressed": 70,
+        "contradicted": 2,
+        "recommendations": 7,
+        "decisionPoints": 797
+      },
+      "evaluation": {
+        "policyRevision": "67ba35ab540fd8b6",
+        "clauses": {
+          "total": 30,
+          "expressible": 15,
+          "inexpressible": 15,
+          "expressibleAdjacent": 12,
+          "byReason": {
+            "the subject is a property of the file being written — chart code — not a typed action": 1,
+            "the antecedent is a property of the prompt text, which the corpus does not persist": 1,
+            "conditional on intent (would a capability make the page more useful) and on an argument value (capabilities), neither of which is a typed action": 1,
+            "conditional on what the page contains; no typed action marks a diagram": 1,
+            "no type names a Workflow call — action:spawn_agent covers Agent and Workflow together, and the corpus has 0 Workflow calls to justify splitting it": 1,
+            "needs the operator's intent, which polyx does not carry": 1,
+            "guard and a destructive action share an event type — alphabet v2 puts `git checkout -b` and `git reset --hard` both in action:git_discard, so the clause cannot be stated without flag-level typing": 1,
+            "a flag on a command; the corpus deliberately does not persist command text": 1,
+            "a flag on a command": 1,
+            "the content of an argument, not an action": 1,
+            "a preference between two event types, which is not a shape polyx has": 1,
+            "the guard is an utterance, and the pattern table requires a guard to be an action": 1,
+            "not an action": 1,
+            "conditional on the content of a diff, which polyx does not carry": 1,
+            "a deferred tool is not an event type but a property of many — expressible one surface at a time (see cc-toolsearch-before-browser-drive), not as one clause": 1
+          }
+        },
+        "precision": {
+          "strict": 0.06363636363636363,
+          "lenient": 0.06363636363636363,
+          "alignable": 0.06422018348623854
+        },
+        "recall": {
+          "strict": 0.13333333333333333,
+          "lenient": 0.13333333333333333
+        },
+        "recallViolatedOnly": {
+          "strict": 0.5,
+          "lenient": 0.5,
+          "den": 4
+        },
+        "refusalCorrectness": 0.8787878787878788,
+        "failedShare": 0.04307334109429569,
+        "gate": "falsified"
+      },
+      "diff": {
+        "tribal": 92,
+        "tribalExtended": 0,
+        "tribalNovel": 92,
+        "confirmed": 7,
+        "gap": {
+          "violated": 2,
+          "neverExercised": 11,
+          "keptNotMined": 0
+        },
+        "contradictions": 1,
+        "inexpressible": 15
+      },
+      "coverageCeiling": {
+        "coverage": 0.4592220828105395,
+        "agreement": 0.875,
+        "outcomePrecision": 1,
+        "cleared": 0.15683814303638646,
+        "warned": 0.18946047678795483
+      }
+    },
+    "bpic2017": {
+      "corpusRevision": "183c5e5189282779",
+      "alphabetVersion": 2,
+      "interactions": 31509,
+      "events": 1202267,
+      "unknownRate": 0,
+      "rules": {
+        "proposed": 22,
+        "refused": 0,
+        "suppressed": 65,
+        "contradicted": 0,
+        "recommendations": 2,
+        "decisionPoints": 31509
+      },
+      "coverageCeiling": {
+        "coverage": 1,
+        "agreement": 1,
+        "outcomePrecision": 0.5484702811117125,
+        "cleared": 0,
+        "warned": 0.0612523406010981
+      }
+    },
+    "synthetic-observable": {
+      "corpusRevision": "19b8a0f0651bb6dc",
+      "alphabetVersion": 2,
+      "interactions": 10,
+      "events": 50,
+      "unknownRate": 0,
+      "rules": {
+        "proposed": 3,
+        "refused": 0,
+        "suppressed": 6,
+        "contradicted": 0,
+        "recommendations": 1,
+        "decisionPoints": 10
+      },
+      "coverageCeiling": {
+        "coverage": 0.5,
+        "agreement": 1,
+        "outcomePrecision": 0,
+        "cleared": 0,
+        "warned": 0
+      }
+    }
+  }
+}

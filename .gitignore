@@ -1,0 +1,16 @@
+node_modules/
+dist/
+corpora/*
+!corpora/README.md
+!corpora/fetch-*.mjs
+!corpora/link-*.mjs
+.polyx/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# agent and tool scratch — never part of the product
+.claude/
+.puffin/
+docs/.archify-delivery-*/

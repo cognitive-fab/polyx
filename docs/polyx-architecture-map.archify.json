@@ -1,0 +1,514 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "polyx — mining rules an agent's own history supports",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1300,
+      440
+    ],
+    "repository": {
+      "url": "https://github.com/cognitive-fab/polyx",
+      "revision": "1905e9e25a1b1b4bcda159733962657a3b770d97"
+    },
+    "views": [
+      {
+        "id": "ingest-path",
+        "label": "Corpus to typed record",
+        "focus": [
+          "corpora",
+          "adapters",
+          "alphabet",
+          "segport",
+          "pipeline"
+        ],
+        "note": "One adapter per source format, one reviewed alphabet, one segmenter — then a validated canonical record."
+      },
+      {
+        "id": "mining-path",
+        "label": "Mining path",
+        "focus": [
+          "pipeline",
+          "subjport",
+          "miner",
+          "store"
+        ],
+        "note": "Subjects and provenance arrive through ports; no LLM call happens anywhere in here."
+      },
+      {
+        "id": "human-gate",
+        "label": "The human gate",
+        "focus": [
+          "store",
+          "review",
+          "advisor"
+        ],
+        "note": "Nothing is served that a person has not adjudicated real."
+      },
+      {
+        "id": "answer-key",
+        "label": "Answer-key boundary",
+        "focus": [
+          "policies",
+          "evaluate",
+          "store"
+        ],
+        "note": "Policy clause sets are evaluation input and are structurally unreachable from the miner."
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "corpora",
+      "type": "external",
+      "label": "Corpora",
+      "sublabel": "ABCD · τ² · BPIC 2017 · cc",
+      "tag": "gitignored; fetch scripts only",
+      "pos": [
+        30,
+        175
+      ],
+      "size": [
+        190,
+        66
+      ],
+      "sources": [
+        {
+          "path": "polyx.config.json",
+          "label": "corpus registry"
+        }
+      ]
+    },
+    {
+      "id": "adapters",
+      "type": "backend",
+      "label": "Ingest adapters",
+      "sublabel": "5 formats → raw interactions",
+      "pos": [
+        295,
+        175
+      ],
+      "size": [
+        180,
+        66
+      ],
+      "sources": [
+        {
+          "path": "src/ingest/index.ts",
+          "line": 1,
+          "end_line": 16,
+          "label": "adapter registry"
+        }
+      ]
+    },
+    {
+      "id": "alphabet",
+      "type": "security",
+      "label": "Alphabet",
+      "sublabel": "typing · redaction · outcomes",
+      "tag": "reviewed, versioned, committed",
+      "pos": [
+        560,
+        30
+      ],
+      "size": [
+        180,
+        66
+      ],
+      "sources": [
+        {
+          "path": "src/alphabet/index.ts",
+          "label": "classify + applyAlphabet"
+        },
+        {
+          "path": "src/alphabet/redact.ts",
+          "label": "redaction at ingestion"
+        }
+      ]
+    },
+    {
+      "id": "pipeline",
+      "type": "backend",
+      "label": "Pipeline",
+      "sublabel": "loadCorpus → LoadedCorpus",
+      "tag": "validated canonical record",
+      "pos": [
+        560,
+        175
+      ],
+      "size": [
+        180,
+        66
+      ],
+      "sources": [
+        {
+          "path": "src/pipeline.ts",
+          "line": 60,
+          "label": "loadCorpus"
+        },
+        {
+          "path": "src/record.ts",
+          "line": 50,
+          "label": "Event / validateInteraction"
+        }
+      ]
+    },
+    {
+      "id": "segport",
+      "type": "cloud",
+      "label": "Segmentation port",
+      "sublabel": "null | polyness",
+      "tag": "the corpus chooses",
+      "pos": [
+        295,
+        30
+      ],
+      "size": [
+        180,
+        66
+      ],
+      "sources": [
+        {
+          "path": "src/ports/segmentation.ts",
+          "label": "Segmenter"
+        }
+      ]
+    },
+    {
+      "id": "subjport",
+      "type": "cloud",
+      "label": "Subjects + provenance ports",
+      "sublabel": "naive | polyness",
+      "tag": "two implementations each",
+      "pos": [
+        825,
+        30
+      ],
+      "size": [
+        225,
+        66
+      ],
+      "sources": [
+        {
+          "path": "src/ports/subjects.ts",
+          "line": 21,
+          "label": "Instance windows"
+        },
+        {
+          "path": "src/ports/provenance.ts",
+          "label": "own | borrowed | neither"
+        }
+      ]
+    },
+    {
+      "id": "miner",
+      "type": "backend",
+      "label": "Miner",
+      "sublabel": "patterns → provenance → subsumption",
+      "pos": [
+        825,
+        175
+      ],
+      "size": [
+        225,
+        66
+      ],
+      "sources": [
+        {
+          "path": "src/mine/index.ts",
+          "line": 71,
+          "label": "mine()"
+        },
+        {
+          "path": "src/mine/patterns.ts",
+          "line": 1,
+          "end_line": 13,
+          "label": "pattern table"
+        },
+        {
+          "path": "src/mine/contradictions.ts",
+          "label": "contradictions"
+        }
+      ]
+    },
+    {
+      "id": "store",
+      "type": "database",
+      "label": "Store",
+      "sublabel": "SQLite · rule identity",
+      "tag": "derived artefacts only",
+      "pos": [
+        1090,
+        175
+      ],
+      "size": [
+        180,
+        66
+      ],
+      "sources": [
+        {
+          "path": "src/store/db.ts",
+          "line": 1,
+          "end_line": 10,
+          "label": "schema + migrations"
+        },
+        {
+          "path": "src/store/rules.ts",
+          "line": 1,
+          "end_line": 7,
+          "label": "verdicts survive re-mining"
+        }
+      ]
+    },
+    {
+      "id": "review",
+      "type": "frontend",
+      "label": "Reviewer",
+      "sublabel": "one rule per screen",
+      "tag": "local node:http",
+      "pos": [
+        1090,
+        30
+      ],
+      "size": [
+        180,
+        66
+      ],
+      "sources": [
+        {
+          "path": "src/review/server.ts",
+          "line": 1,
+          "end_line": 10,
+          "label": "adjudication surface"
+        }
+      ]
+    },
+    {
+      "id": "advisor",
+      "type": "backend",
+      "label": "Advisor",
+      "sublabel": "three-valued; abstains",
+      "tag": "no closed-world assumption",
+      "pos": [
+        1090,
+        320
+      ],
+      "size": [
+        180,
+        66
+      ],
+      "sources": [
+        {
+          "path": "src/serve/advisor.ts",
+          "line": 1,
+          "end_line": 19,
+          "label": "forward chaining"
+        },
+        {
+          "path": "src/serve/coverage.ts",
+          "label": "replay + coverage"
+        }
+      ]
+    },
+    {
+      "id": "evaluate",
+      "type": "backend",
+      "label": "Evaluate + diff",
+      "sublabel": "align · metrics · three regions",
+      "pos": [
+        825,
+        320
+      ],
+      "size": [
+        180,
+        66
+      ],
+      "sources": [
+        {
+          "path": "src/evaluate/index.ts",
+          "line": 1,
+          "end_line": 4,
+          "label": "headline figures"
+        },
+        {
+          "path": "src/diff/index.ts",
+          "line": 1,
+          "end_line": 9,
+          "label": "tribal / confirmed / gap"
+        }
+      ]
+    },
+    {
+      "id": "policies",
+      "type": "external",
+      "label": "Policy clause sets",
+      "sublabel": "policies/*.yaml",
+      "tag": "the answer key",
+      "pos": [
+        560,
+        320
+      ],
+      "size": [
+        180,
+        66
+      ],
+      "sources": [
+        {
+          "path": "policies/abcd-guidelines.yaml",
+          "line": 1,
+          "end_line": 3,
+          "label": "evaluation input"
+        }
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "No LLM call in the mining path — same corpus + alphabet + thresholds → identical rule set",
+      "wraps": [
+        "alphabet",
+        "adapters",
+        "pipeline",
+        "segport",
+        "subjport",
+        "miner"
+      ]
+    },
+    {
+      "kind": "security-group",
+      "label": "Answer key — evaluate / diff / cli only (check:boundary)",
+      "wraps": [
+        "evaluate",
+        "policies"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "read-corpus",
+      "from": "corpora",
+      "to": "adapters",
+      "label": "read source files",
+      "labelDy": -45
+    },
+    {
+      "id": "raw-interactions",
+      "from": "adapters",
+      "to": "pipeline",
+      "label": "raw interactions",
+      "labelDy": -45,
+      "labelDx": -50
+    },
+    {
+      "id": "typing",
+      "from": "alphabet",
+      "to": "pipeline",
+      "label": "type · redact · classify outcome",
+      "variant": "security",
+      "labelDy": 24
+    },
+    {
+      "id": "segmentation",
+      "from": "segport",
+      "to": "pipeline",
+      "label": "episode ids",
+      "fromSide": "bottom",
+      "toSide": "left",
+      "via": [
+        [
+          385,
+          135
+        ],
+        [
+          520,
+          135
+        ],
+        [
+          520,
+          208
+        ]
+      ]
+    },
+    {
+      "id": "typed-corpus",
+      "from": "pipeline",
+      "to": "miner",
+      "label": "typed interactions",
+      "variant": "emphasis",
+      "labelDy": -45
+    },
+    {
+      "id": "instances",
+      "from": "subjport",
+      "to": "miner",
+      "label": "instances · provenance level",
+      "labelDy": 24
+    },
+    {
+      "id": "rules-out",
+      "from": "miner",
+      "to": "store",
+      "label": "rules with counter-evidence",
+      "labelDy": -45
+    },
+    {
+      "id": "verdict",
+      "from": "review",
+      "to": "store",
+      "label": "adjudicate: real | not_real | narrowed",
+      "labelDy": 24
+    },
+    {
+      "id": "serve-real",
+      "from": "store",
+      "to": "advisor",
+      "label": "only adjudicated real",
+      "variant": "emphasis",
+      "labelDy": 45
+    },
+    {
+      "id": "measure",
+      "from": "store",
+      "to": "evaluate",
+      "label": "mined rule set"
+    },
+    {
+      "id": "clauses",
+      "from": "policies",
+      "to": "evaluate",
+      "label": "clause sets",
+      "variant": "security"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Ingest and typing",
+      "items": [
+        "One adapter per source format, each with a field-level fixture test",
+        "The alphabet is a reviewed artefact: typing, redaction and outcome rules live in YAML, never in code",
+        "Redaction happens at ingestion, so no free text reaches a stored artefact"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Mining",
+      "items": [
+        "Four obligation patterns plus recommendations, each declaring the window it is measured over",
+        "Provenance says whether the evidence is the operator's own, borrowed, or absent — an absent verdict is a refusal, and it is kept",
+        "Contradictions, then subsumption, then vacuity: a verdict naming another rule outranks 'uninformative'"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Serving and measurement",
+      "items": [
+        "Rule identity is stable across runs, so a verdict given last week still applies to the rule mined today",
+        "The advisor abstains on an unknown fact rather than assuming it false, and serves only what a person adjudicated real",
+        "Evaluate and diff are the only modules that may read a policy; a build check enforces it"
+      ]
+    }
+  ]
+}

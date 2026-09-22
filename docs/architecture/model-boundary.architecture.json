@@ -1,0 +1,291 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Where can a model be called, and where can it not?",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/cognitive-fab/polyx",
+      "revision": "9fb805bbd68483f4417a1c7fec4c24328f64bf8f"
+    },
+    "views": [
+      {
+        "id": "answer",
+        "label": "Where can a model be called, and where can it n…",
+        "focus": [
+          "jev",
+          "annotations"
+        ],
+        "note": "In one place, for mining: the annotation pass asks it once per distinct redacted text and writes the answers to a digested file, and the mi…"
+      },
+      {
+        "id": "free",
+        "label": "polyx-lens — free",
+        "focus": [
+          "predicates",
+          "text-profile",
+          "annotations"
+        ],
+        "note": "Everything here runs without buying anything, imports nothing from the paid half, and can make no network call under any configuration — th…"
+      },
+      {
+        "id": "paid",
+        "label": "polyx — BUSL 1.1",
+        "focus": [
+          "miner",
+          "annotator"
+        ],
+        "note": "Source-available, internal use granted, Apache-2.0 in four years: the half that turns a corpus into rules nobody wrote down, and the half t…"
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "predicates",
+      "type": "database",
+      "label": "Predicate sets",
+      "pos": [
+        60,
+        48
+      ],
+      "size": [
+        150,
+        62
+      ],
+      "sublabel": "reviewed; quadrant declared"
+    },
+    {
+      "id": "text-profile",
+      "type": "database",
+      "label": "Text redaction",
+      "pos": [
+        60,
+        113
+      ],
+      "size": [
+        150,
+        62
+      ],
+      "sublabel": "before anything reads it"
+    },
+    {
+      "id": "annotator",
+      "type": "backend",
+      "label": "Annotation pass",
+      "pos": [
+        380,
+        208
+      ],
+      "size": [
+        150,
+        62
+      ],
+      "sublabel": "explicit, never implicit",
+      "sources": [
+        {
+          "path": "src/ports/jev/annotate.ts",
+          "label": "the pass and the preview"
+        },
+        {
+          "path": "examples/jev-observation/README.md",
+          "label": "run end to end with no key"
+        }
+      ]
+    },
+    {
+      "id": "jev",
+      "type": "external",
+      "label": "Jev adapter",
+      "pos": [
+        380,
+        302
+      ],
+      "size": [
+        150,
+        62
+      ],
+      "sublabel": "MIT; the only network code",
+      "sources": [
+        {
+          "path": "src/ports/jev/client.ts",
+          "label": "bearer, timeout, backoff on 429/529"
+        },
+        {
+          "path": "src/ports/jev/observer.ts",
+          "label": "the Observer implementation"
+        },
+        {
+          "path": "src/ports/jev/LICENSE",
+          "label": "MIT, carved out of the BUSL grant"
+        }
+      ]
+    },
+    {
+      "id": "vendor-api",
+      "type": "external",
+      "label": "TypeSafe API",
+      "pos": [
+        700,
+        302
+      ],
+      "size": [
+        150,
+        62
+      ],
+      "sublabel": "api.typesafe.ai"
+    },
+    {
+      "id": "annotations",
+      "type": "database",
+      "label": "Annotation store",
+      "pos": [
+        1020,
+        80
+      ],
+      "size": [
+        150,
+        62
+      ],
+      "sublabel": "recorded once, digested"
+    },
+    {
+      "id": "miner",
+      "type": "backend",
+      "label": "Miner",
+      "pos": [
+        1020,
+        208
+      ],
+      "size": [
+        150,
+        62
+      ],
+      "sublabel": "patterns, provenance",
+      "sources": [
+        {
+          "path": "src/mine/index.ts",
+          "label": "mine()"
+        },
+        {
+          "path": "src/mine/patterns.ts",
+          "label": "the pattern table"
+        },
+        {
+          "path": "src/mine/facts.ts",
+          "label": "a withheld observation is evidence"
+        }
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "security-group",
+      "label": "polyx-lens — free",
+      "wraps": [
+        "predicates",
+        "text-profile",
+        "annotations"
+      ],
+      "pad": 20
+    },
+    {
+      "kind": "security-group",
+      "label": "polyx — BUSL 1.1",
+      "wraps": [
+        "miner",
+        "annotator"
+      ],
+      "pad": 20
+    }
+  ],
+  "connections": [
+    {
+      "from": "predicates",
+      "to": "annotator",
+      "label": "the questions, and their bands",
+      "labelAt": [
+        135,
+        189
+      ],
+      "variant": "security"
+    },
+    {
+      "from": "text-profile",
+      "to": "annotator",
+      "label": "redact before egress · file",
+      "labelAt": [
+        135,
+        189
+      ],
+      "variant": "security"
+    },
+    {
+      "from": "annotator",
+      "to": "jev",
+      "label": "one call per distinct text",
+      "labelAt": [
+        455,
+        284
+      ],
+      "variant": "security"
+    },
+    {
+      "from": "jev",
+      "to": "vendor-api",
+      "label": "POST /v1/systemone · HTTPS",
+      "labelAt": [
+        455,
+        378
+      ],
+      "variant": "security"
+    },
+    {
+      "from": "annotator",
+      "to": "annotations",
+      "label": "write once, digest, rename · file",
+      "labelAt": [
+        615,
+        88
+      ],
+      "variant": "security"
+    },
+    {
+      "from": "miner",
+      "to": "annotations",
+      "label": "reads the recording as data · file",
+      "labelAt": [
+        1095,
+        160
+      ],
+      "variant": "security"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "The short answer",
+      "items": [
+        "In one place, for mining: the annotation pass asks it once per distinct redacted text and writes the answers to a digested file, and the miner reads that file as data — check:boundary fails the build if anything under src/mine could import the port",
+        "The free half defines the port, holds the predicates, the redaction profile and the store, and can reach nothing: check:offline fails its build on any code that could",
+        "The vendor sits in one MIT directory, and the response names the model that answered, so a later drift is a model change and not a mystery"
+      ]
+    },
+    {
+      "dot": "slate",
+      "title": "Not shown here",
+      "items": [
+        "The live path — the second place the model is called — which has its own question next",
+        "calibration, which is how a predicate earns the right to be asked",
+        "and the advisor"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "What it guarantees",
+      "items": [
+        "The model is called in a separate pass and mining reads the recording — a call is not bit-stable — the vendor says similar answers for similar inputs — so byte-for-byte reproducibility requires a pinned file, digested like corpusRevision",
+        "The vendor is reachable from one directory and the free half can reach nothing — swapping the vendor must change nothing above the port, and the free half's whole claim is that nothing leaves the machine"
+      ]
+    }
+  ]
+}

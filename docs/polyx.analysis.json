@@ -1,0 +1,1294 @@
+{
+ "schema_version": 1,
+ "system": {
+  "name": "polyx",
+  "purpose": "Mine the rules an agent's own history supports, put them in front of a person, and serve the ones they accept at the moment a consequential action is about to happen — abstaining rather than guessing when a fact is missing. A System One model may observe what was said, and may add a fact; it may never assert an absence.",
+  "repository": {
+   "url": "https://github.com/cognitive-fab/polyx",
+   "revision": "9fb805bbd68483f4417a1c7fec4c24328f64bf8f"
+  },
+  "sources": [
+   {
+    "kind": "code",
+    "ref": "src/mine/, src/store/, src/serve/, src/review/, src/evaluate/, src/diff/, scripts/check-*.mjs",
+    "note": "read at 9fb805b"
+   },
+   {
+    "kind": "code",
+    "ref": "polyx-bench: policies/, polyx-eval: policies/cc-policy.yaml",
+    "note": "two more sibling repositories, read directly; likewise unverifiable from here"
+   },
+   {
+    "kind": "document",
+    "ref": "LICENSING.md, docs/polyx-technical-spec.md",
+    "note": "the licence split and the standing rules; §15 rev. 1-16 is the record of what was tried and rejected"
+   },
+   {
+    "kind": "code",
+    "ref": "polyx-lens: src/ports/observation.ts, src/ports/text.ts, src/ports/predicates.ts, src/ports/calibrate.ts, src/ports/annotations.ts, src/alphabet/text.ts, src/record.ts, src/alphabet/, src/ingest/, src/ports/, src/pipeline.ts, src/lens/",
+    "note": "a sibling repository at polyx-lens@54446ec; its components carry no evidence paths here because evidence is verified against THIS repository's git"
+   },
+   {
+    "kind": "code",
+    "ref": "src/ports/jev/, src/serve/observe.ts, src/serve/advisor.ts, scripts/check-boundary.mjs, scripts/check-notice.mjs, examples/",
+    "note": "the observation port's paid-side adapter and the checks that confine it; read at 9fb805b"
+   },
+   {
+    "kind": "document",
+    "ref": "docs/polyx-jev-integration-spec.md, docs/polyx-jev-implementation-plan.md",
+    "note": "the observation port's requirements (JF*/JT*) and what the measurements changed about them"
+   }
+  ]
+ },
+ "layers": [
+  {
+   "id": "sources",
+   "label": "What was recorded",
+   "order": 1
+  },
+  {
+   "id": "ingest",
+   "label": "Ingest and typing",
+   "order": 2
+  },
+  {
+   "id": "observe",
+   "label": "Observing what was said",
+   "order": 3
+  },
+  {
+   "id": "check",
+   "label": "Checking written rules",
+   "order": 4
+  },
+  {
+   "id": "mine",
+   "label": "Mining unwritten ones",
+   "order": 5
+  },
+  {
+   "id": "serve",
+   "label": "Adjudication and serving",
+   "order": 6
+  },
+  {
+   "id": "measure",
+   "label": "Measurement",
+   "order": 7
+  }
+ ],
+ "boundaries": [
+  {
+   "id": "free",
+   "kind": "licence",
+   "label": "polyx-lens — free",
+   "claim": "Everything here runs without buying anything, imports nothing from the paid half, and can make no network call under any configuration — the dependency runs one way and check:offline fails the build on any code that could reach out",
+   "contains": [
+    "lens-cli",
+    "adapters",
+    "alphabet",
+    "pipeline",
+    "ports",
+    "contracts",
+    "checker",
+    "report",
+    "obs-port",
+    "predicates",
+    "text-profile",
+    "annotations"
+   ],
+   "evidence": [
+    {
+     "path": "LICENSING.md",
+     "label": "the three-tier plan"
+    },
+    {
+     "path": "LICENSING.md",
+     "label": "Apache-2.0"
+    }
+   ]
+  },
+  {
+   "id": "paid",
+   "kind": "licence",
+   "label": "polyx — BUSL 1.1",
+   "claim": "Source-available, internal use granted, Apache-2.0 in four years: the half that turns a corpus into rules nobody wrote down, and the half that is sold",
+   "contains": [
+    "miner",
+    "store",
+    "reviewer",
+    "advisor",
+    "evaluator",
+    "differ",
+    "annotator",
+    "calibrator",
+    "live-observer"
+   ],
+   "evidence": [
+    {
+     "path": "LICENSING.md",
+     "label": "why not a proprietary EULA"
+    },
+    {
+     "path": "package.json",
+     "label": "the licence field"
+    }
+   ]
+  },
+  {
+   "id": "keys",
+   "kind": "ownership",
+   "label": "Answer keys",
+   "claim": "Written rulebooks decomposed by hand into clauses, used to score the miner and never used by it — a shipped answer key would be a shipped evaluation",
+   "contains": [
+    "bench-keys",
+    "eval-keys"
+   ],
+   "evidence": [
+    {
+     "path": "scripts/check-shippable.mjs",
+     "label": "the tree may not contain one"
+    }
+   ]
+  },
+  {
+   "id": "vendor",
+   "kind": "licence",
+   "label": "src/ports/jev — MIT",
+   "claim": "The only code in either package that can make a network call, confined to one directory that nothing outside it may import, and licensed so that 'what leaves my machine?' is the one question nobody has to ask a licence about",
+   "contains": [
+    "jev"
+   ],
+   "evidence": [
+    {
+     "path": "src/ports/jev/LICENSE",
+     "label": "MIT"
+    },
+    {
+     "path": "scripts/check-boundary.mjs",
+     "label": "reachable from here and nowhere else"
+    },
+    {
+     "path": "scripts/check-notice.mjs",
+     "label": "every file carries the header"
+    }
+   ]
+  },
+  {
+   "id": "agent",
+   "kind": "process",
+   "label": "The agent's process",
+   "claim": "Nothing about polyx is imported here; the hook depends on the free half to type the transcript and on loopback HTTP to reach the advisor",
+   "contains": [
+    "agent-hook"
+   ],
+   "evidence": [
+    {
+     "path": "examples/claude-code-hook/README.md",
+     "label": "the licence line stays where the diagram draws it"
+    }
+   ]
+  }
+ ],
+ "components": [
+  {
+   "id": "corpora",
+   "name": "Corpora",
+   "kind": "file-store",
+   "detail": "gitignored, never copied",
+   "layer": "sources",
+   "status": "built",
+   "responsibility": "Holds the recorded work wherever it already is, because a corpus that has to leave the machine is a corpus nobody will hand over.",
+   "evidence": [
+    {
+     "path": "polyx.config.json",
+     "label": "corpora are named, not stored"
+    }
+   ]
+  },
+  {
+   "id": "adapters",
+   "name": "Ingest adapters",
+   "kind": "library",
+   "detail": "5 formats, 1 pure fn each",
+   "layer": "ingest",
+   "status": "built",
+   "responsibility": "Turns each source format into raw interactions with one pure function per format, each held to a field-level fixture test on hand-checked examples."
+  },
+  {
+   "id": "alphabet",
+   "name": "Alphabet",
+   "kind": "schema",
+   "detail": "typing, redaction, ordinal",
+   "layer": "ingest",
+   "status": "built",
+   "responsibility": "Declares what every event is and what it costs to take back, as a reviewed artefact that is versioned and stamped on every figure derived from it."
+  },
+  {
+   "id": "ports",
+   "name": "Ports",
+   "kind": "library",
+   "detail": "five ports, two impls each",
+   "layer": "ingest",
+   "status": "built",
+   "responsibility": "Defines how a session is cut, what counts as a subject, and whose evidence a rule rests on — as interfaces rather than as one library."
+  },
+  {
+   "id": "polyness",
+   "name": "polyness",
+   "kind": "third-party",
+   "detail": "vendored, Apache-2.0",
+   "layer": "ingest",
+   "status": "built",
+   "responsibility": "Supplies the second implementation behind each of the three ports, vendored byte-for-byte so a checkout installs without a sibling repository."
+  },
+  {
+   "id": "pipeline",
+   "name": "Pipeline",
+   "kind": "engine",
+   "detail": "loadCorpus",
+   "layer": "ingest",
+   "status": "built",
+   "responsibility": "Turns raw interactions into validated records in one vocabulary, so everything downstream consumes one shape."
+  },
+  {
+   "id": "contracts",
+   "name": "Contract sets",
+   "kind": "schema",
+   "detail": "what a harness publishes",
+   "layer": "check",
+   "status": "built",
+   "responsibility": "Carries the rules a harness states about itself, decomposed into clauses, with the ones no precedence language can reach recorded alongside the reason."
+  },
+  {
+   "id": "checker",
+   "name": "Clause checker",
+   "kind": "engine",
+   "detail": "clause x corpus, no model",
+   "layer": "check",
+   "status": "built",
+   "responsibility": "Counts, for every written clause, how often the corpus exercised it and how often it broke it — over the window the clause itself names."
+  },
+  {
+   "id": "report",
+   "name": "The report",
+   "kind": "library",
+   "detail": "leads with the unknown rate",
+   "layer": "check",
+   "status": "built",
+   "responsibility": "Says what could not be named before it says any finding, separates never-violated from never-exercised, and names the question it cannot answer at all."
+  },
+  {
+   "id": "lens-cli",
+   "name": "polyx-lens",
+   "kind": "cli",
+   "detail": "no arguments needed",
+   "layer": "check",
+   "status": "built",
+   "responsibility": "Runs the whole free half against the transcripts the agent already wrote, with no configuration and no network call."
+  },
+  {
+   "id": "miner",
+   "name": "Miner",
+   "kind": "engine",
+   "detail": "patterns, provenance",
+   "layer": "mine",
+   "status": "built",
+   "responsibility": "Derives rules the corpus supports, each carrying its support, its provenance level and the records that contradict it.",
+   "evidence": [
+    {
+     "path": "src/mine/index.ts",
+     "label": "mine()"
+    },
+    {
+     "path": "src/mine/patterns.ts",
+     "label": "the pattern table"
+    },
+    {
+     "path": "src/mine/facts.ts",
+     "label": "a withheld observation is evidence"
+    }
+   ]
+  },
+  {
+   "id": "store",
+   "name": "Store",
+   "kind": "store",
+   "detail": "SQLite, derived only",
+   "layer": "serve",
+   "status": "built",
+   "responsibility": "Keeps rules, human verdicts and run manifests under an identity stable across re-mining, so a verdict given last week still applies to the rule mined today.",
+   "evidence": [
+    {
+     "path": "src/store/db.ts",
+     "label": "schema and migrations"
+    },
+    {
+     "path": "src/store/rules.ts",
+     "label": "verdicts survive re-mining"
+    }
+   ]
+  },
+  {
+   "id": "reviewer",
+   "name": "Reviewer",
+   "kind": "ui",
+   "detail": "one rule per screen",
+   "layer": "serve",
+   "status": "built",
+   "responsibility": "Puts one rule in front of a person with the records on both sides of it, and saves the verdict the moment it is given.",
+   "evidence": [
+    {
+     "path": "src/review/server.ts",
+     "label": "the adjudication surface"
+    }
+   ]
+  },
+  {
+   "id": "advisor",
+   "name": "Advisor",
+   "kind": "service",
+   "detail": "fire, warn, or abstain",
+   "layer": "serve",
+   "status": "built",
+   "responsibility": "Answers at a decision point using only rules a person marked real, and abstains when a fact is missing rather than treating absence as falsehood; an observed fact enters the fact base first, under everything else, so observation can only add.",
+   "evidence": [
+    {
+     "path": "src/serve/advisor.ts",
+     "label": "forward chaining, three-valued"
+    },
+    {
+     "path": "src/serve/coverage.ts",
+     "label": "replayed over the corpus"
+    },
+    {
+     "path": "test/invariant.test.ts",
+     "label": "no warning withdrawn, no abstention created"
+    }
+   ]
+  },
+  {
+   "id": "evaluator",
+   "name": "Evaluator",
+   "kind": "engine",
+   "detail": "precision, recall, refusal",
+   "layer": "measure",
+   "status": "built",
+   "responsibility": "Scores the mined set against a written clause set, reporting recall over the clauses the corpus actually violated beside the headline figure.",
+   "evidence": [
+    {
+     "path": "src/evaluate/index.ts",
+     "label": "the headline figures"
+    }
+   ]
+  },
+  {
+   "id": "differ",
+   "name": "Three-region diff",
+   "kind": "engine",
+   "detail": "tribal, confirmed, gap",
+   "layer": "measure",
+   "status": "built",
+   "responsibility": "Splits mined rules against written clauses into what is followed but never written, what both agree on, and what is written but broken.",
+   "evidence": [
+    {
+     "path": "src/diff/index.ts",
+     "label": "the three regions"
+    }
+   ]
+  },
+  {
+   "id": "bench-keys",
+   "name": "polyx-bench",
+   "kind": "file-store",
+   "detail": "public rulebooks",
+   "layer": "measure",
+   "status": "built",
+   "responsibility": "Holds hand decompositions of public benchmark rulebooks, so a published figure can be argued with clause by clause."
+  },
+  {
+   "id": "eval-keys",
+   "name": "polyx-eval",
+   "kind": "file-store",
+   "detail": "private rulebooks",
+   "layer": "measure",
+   "status": "built",
+   "responsibility": "Holds the clause sets decomposed from corpora that cannot be redistributed, and is licensed to nobody."
+  },
+  {
+   "id": "obs-port",
+   "name": "Observation port",
+   "kind": "library",
+   "detail": "adds a fact, never absence",
+   "layer": "observe",
+   "status": "built",
+   "responsibility": "Defines the one function a model may perform — (text, declared predicate) to a fact or to nothing — and owns the band arithmetic that turns a jittering probability into true, false, or a recorded withholding.",
+   "notes": "polyx-lens/src/ports/observation.ts. The null observer is the default, not an alternative: a deployment that has not opted in cannot tell the port exists."
+  },
+  {
+   "id": "predicates",
+   "name": "Predicate sets",
+   "kind": "config",
+   "detail": "reviewed; quadrant declared",
+   "layer": "observe",
+   "status": "built",
+   "responsibility": "Declares each question a model may be asked, under the same discipline as the alphabet, and refuses at load the one kind of question the measurements showed a model answers confidently and wrongly.",
+   "notes": "polyx-lens/alphabets/predicates.*.yaml, loaded by src/ports/predicates.ts. `quadrant: sequence-unknown` is rejected with JF2.4 quoted. A predicate is inert until a person has labelled a sample and bands were derived from it."
+  },
+  {
+   "id": "text-profile",
+   "name": "Text redaction",
+   "kind": "config",
+   "detail": "before anything reads it",
+   "layer": "observe",
+   "status": "built",
+   "responsibility": "Strips identifiers from free text under a declared, versioned profile before a predicate, a labeller or a vendor sees it, and names the profile on every annotation line so a weaker one is identifiable after the fact.",
+   "notes": "polyx-lens/src/alphabet/text.ts and alphabets/text.*.yaml. Finished against the real corpus: three passes until a scan of 2,721 payloads found nothing."
+  },
+  {
+   "id": "annotations",
+   "name": "Annotation store",
+   "kind": "file-store",
+   "detail": "recorded once, digested",
+   "layer": "mine",
+   "status": "built",
+   "responsibility": "Holds the model's answers, recorded once in a separate pass, sorted and digested, so that mining reads a pinned file rather than making a call that is not bit-stable.",
+   "notes": "polyx-lens/src/ports/annotations.ts; files under .polyx/annotations/. The digest joins corpusRevision in the manifest. A withheld answer is a written line with value null and its p retained."
+  },
+  {
+   "id": "jev",
+   "name": "Jev adapter",
+   "kind": "model-provider",
+   "detail": "MIT; the only network code",
+   "layer": "observe",
+   "status": "built",
+   "responsibility": "Makes the one network call in either package — one call per distinct redacted text carrying the whole predicate battery — and records which model actually answered.",
+   "evidence": [
+    {
+     "path": "src/ports/jev/client.ts",
+     "label": "bearer, timeout, backoff on 429/529"
+    },
+    {
+     "path": "src/ports/jev/observer.ts",
+     "label": "the Observer implementation"
+    },
+    {
+     "path": "src/ports/jev/LICENSE",
+     "label": "MIT, carved out of the BUSL grant"
+    }
+   ]
+  },
+  {
+   "id": "annotator",
+   "name": "Annotation pass",
+   "kind": "workflow",
+   "detail": "explicit, never implicit",
+   "layer": "observe",
+   "status": "built",
+   "responsibility": "Resolves every site a real, calibrated predicate could read, redacts it, groups by distinct text, asks once per text, and writes the store — or, on a dry run, writes the exact payloads and sends nothing.",
+   "evidence": [
+    {
+     "path": "src/ports/jev/annotate.ts",
+     "label": "the pass and the preview"
+    },
+    {
+     "path": "examples/jev-observation/README.md",
+     "label": "run end to end with no key"
+    }
+   ]
+  },
+  {
+   "id": "calibrator",
+   "name": "Calibration",
+   "kind": "workflow",
+   "detail": "person labels, bands derived",
+   "layer": "observe",
+   "status": "built",
+   "responsibility": "Draws a deterministic sample the reviewer labels without ever seeing the model's answer, then derives bands from the labelled distribution — refusing when the labels do not separate, which is what a question about the world looks like from the labelling chair.",
+   "evidence": [
+    {
+     "path": "src/ports/jev/calibrate.ts",
+     "label": "sample, label file, derive"
+    },
+    {
+     "path": "src/ports/jev/label-server.ts",
+     "label": "one text per screen, never p"
+    }
+   ]
+  },
+  {
+   "id": "live-observer",
+   "name": "Live resolution",
+   "kind": "service",
+   "detail": "before the pure advisor",
+   "layer": "serve",
+   "status": "built",
+   "responsibility": "On a request that carries text, redacts and observes it before the advisor is called, so the advisor stays synchronous and pure and every observation reaches the decision log with its probability.",
+   "evidence": [
+    {
+     "path": "src/serve/observe.ts",
+     "label": "never throws; falls back by name"
+    },
+    {
+     "path": "src/serve/http.ts",
+     "label": "resolved before advise()"
+    }
+   ]
+  },
+  {
+   "id": "agent-hook",
+   "name": "Agent hook",
+   "kind": "cli",
+   "detail": "PreToolUse, fails open",
+   "layer": "serve",
+   "status": "built",
+   "responsibility": "Asks the advisor before a tool runs, typing the session so far exactly as the corpus was typed, and turns the verdict into an exit code the agent's runtime understands.",
+   "evidence": [
+    {
+     "path": "examples/claude-code-hook/polyx-hook.mjs",
+     "label": "the hook"
+    },
+    {
+     "path": "test/hook.test.ts",
+     "label": "run as Claude Code runs it"
+    }
+   ]
+  },
+  {
+   "id": "vendor-api",
+   "name": "TypeSafe API",
+   "kind": "external-service",
+   "detail": "api.typesafe.ai",
+   "layer": "observe",
+   "status": "built",
+   "responsibility": "Answers a battery of yes/no questions over one text with calibrated probabilities in ~200 ms, and names the model version that answered."
+  }
+ ],
+ "relations": [
+  {
+   "from": "corpora",
+   "to": "adapters",
+   "mechanism": "file",
+   "summary": "read in place",
+   "what_crosses": "Source files — JSONL transcripts, benchmark JSON, an XES event log — read where they already are."
+  },
+  {
+   "from": "adapters",
+   "to": "pipeline",
+   "mechanism": "in-process call",
+   "summary": "raw interactions",
+   "what_crosses": "Untyped events with their source features and a pointer back to the file they came from."
+  },
+  {
+   "from": "alphabet",
+   "to": "pipeline",
+   "mechanism": "file",
+   "summary": "type, redact, classify",
+   "what_crosses": "The reviewed rulings: which feature shape is which action, what it costs to take back, and which slots are hashed or tokenised."
+  },
+  {
+   "from": "polyness",
+   "to": "ports",
+   "mechanism": "in-process call",
+   "summary": "one implementation of each",
+   "what_crosses": "Episode boundaries, subject instances and a provenance verdict, behind interfaces polyx owns."
+  },
+  {
+   "from": "ports",
+   "to": "pipeline",
+   "mechanism": "in-process call",
+   "summary": "episode ids",
+   "what_crosses": "The task boundaries a session is cut into, which decide the window every later rule is measured over."
+  },
+  {
+   "from": "pipeline",
+   "to": "checker",
+   "mechanism": "in-process call",
+   "summary": "typed interactions",
+   "what_crosses": "Validated records: typed events, declared consequence, no free text."
+  },
+  {
+   "from": "contracts",
+   "to": "checker",
+   "mechanism": "file",
+   "summary": "clause sets",
+   "what_crosses": "Written rules with their subject, guard and window — and the ones that cannot be stated, with reasons."
+  },
+  {
+   "from": "checker",
+   "to": "report",
+   "mechanism": "in-process call",
+   "summary": "kept, broken, never exercised",
+   "what_crosses": "Per-clause counts with sampled records on both sides, so every figure expands to the sessions behind it."
+  },
+  {
+   "from": "report",
+   "to": "lens-cli",
+   "mechanism": "in-process call",
+   "summary": "the free report",
+   "what_crosses": "The rendered report, or the same thing as JSON."
+  },
+  {
+   "from": "pipeline",
+   "to": "miner",
+   "mechanism": "in-process call",
+   "summary": "typed interactions",
+   "what_crosses": "The same validated records the checker reads. This is the only edge from the free half into the paid one, and it runs in that direction only.",
+   "crosses": "paid"
+  },
+  {
+   "from": "ports",
+   "to": "miner",
+   "mechanism": "in-process call",
+   "summary": "instances, provenance level",
+   "what_crosses": "Every occurrence of a consequential action with the windows around it, and whose evidence a rule rests on.",
+   "crosses": "paid"
+  },
+  {
+   "from": "miner",
+   "to": "store",
+   "mechanism": "database",
+   "summary": "rules with counter-evidence",
+   "what_crosses": "Proposals carrying support, provenance, and the records that contradict them — a rule without its counter-evidence is a claim, not a finding."
+  },
+  {
+   "from": "store",
+   "to": "reviewer",
+   "mechanism": "database",
+   "summary": "the queue, and what breaks it",
+   "what_crosses": "One proposed rule at a time with the interactions on both sides."
+  },
+  {
+   "from": "reviewer",
+   "to": "store",
+   "mechanism": "database",
+   "summary": "real, not_real, narrowed",
+   "what_crosses": "A person's verdict, with a note and the time it took."
+  },
+  {
+   "from": "store",
+   "to": "advisor",
+   "mechanism": "database",
+   "summary": "only what was adjudicated",
+   "what_crosses": "Rules marked real. Nothing else is ever served."
+  },
+  {
+   "from": "store",
+   "to": "evaluator",
+   "mechanism": "database",
+   "summary": "the mined rule set",
+   "what_crosses": "Every rule with its status, so refusals are scored too rather than quietly dropped."
+  },
+  {
+   "from": "bench-keys",
+   "to": "evaluator",
+   "mechanism": "file",
+   "summary": "public clause sets",
+   "what_crosses": "Decomposed benchmark rulebooks and the gold alignment verdicts.",
+   "crosses": "paid"
+  },
+  {
+   "from": "eval-keys",
+   "to": "evaluator",
+   "mechanism": "file",
+   "summary": "private clause sets",
+   "what_crosses": "Clause sets from corpora that cannot be redistributed.",
+   "crosses": "paid"
+  },
+  {
+   "from": "evaluator",
+   "to": "differ",
+   "mechanism": "in-process call",
+   "summary": "alignments",
+   "what_crosses": "Which mined rule answers which written clause, and which of them nobody wrote."
+  },
+  {
+   "from": "predicates",
+   "to": "annotator",
+   "mechanism": "file",
+   "summary": "the questions, and their bands",
+   "what_crosses": "Only predicates that are real, calibrated, and not stale against this corpus revision; the rest are reported as skipped, never dropped.",
+   "crosses": "paid"
+  },
+  {
+   "from": "text-profile",
+   "to": "annotator",
+   "mechanism": "file",
+   "summary": "redact before egress",
+   "what_crosses": "The pattern rules and surrogates; a corpus with no profile cannot be annotated, by name.",
+   "crosses": "paid"
+  },
+  {
+   "from": "annotator",
+   "to": "jev",
+   "mechanism": "in-process call",
+   "summary": "one call per distinct text",
+   "what_crosses": "Redacted text and the whole predicate battery keyed by predicate id; back come probabilities and the model that answered.",
+   "crosses": "vendor"
+  },
+  {
+   "from": "jev",
+   "to": "obs-port",
+   "mechanism": "in-process call",
+   "summary": "implements Observer",
+   "what_crosses": "The second implementation of the interface the free half defines; nothing above the interface knows the vendor.",
+   "crosses": "free"
+  },
+  {
+   "from": "jev",
+   "to": "vendor-api",
+   "mechanism": "https",
+   "summary": "POST /v1/systemone",
+   "what_crosses": "Redacted text and questions out; `answers` and the answering model id back. The only egress in either package.",
+   "crosses": "vendor",
+   "synchronous": true
+  },
+  {
+   "from": "annotator",
+   "to": "annotations",
+   "mechanism": "file",
+   "summary": "write once, digest, rename",
+   "what_crosses": "One line per (site, predicate) with p, value or null, the set version, the redaction profile, the answering model.",
+   "crosses": "free"
+  },
+  {
+   "from": "miner",
+   "to": "annotations",
+   "mechanism": "file",
+   "summary": "reads the recording as data",
+   "what_crosses": "Recorded facts lifted into each instance's fact base from the sites before it; the digest goes into the manifest beside corpusRevision.",
+   "crosses": "free"
+  },
+  {
+   "from": "calibrator",
+   "to": "jev",
+   "mechanism": "in-process call",
+   "summary": "measure after labelling",
+   "what_crosses": "Only labelled items, once per distinct text, and only after every verdict is in — the labeller never saw p.",
+   "crosses": "vendor"
+  },
+  {
+   "from": "calibrator",
+   "to": "predicates",
+   "mechanism": "manual",
+   "summary": "the calibration record",
+   "what_crosses": "Bands derived from the labelled distribution, precision, withheld fraction, label separation — pasted in by a person and versioned.",
+   "crosses": "free"
+  },
+  {
+   "from": "agent-hook",
+   "to": "live-observer",
+   "mechanism": "http",
+   "summary": "POST /advise, with text",
+   "what_crosses": "Events so far with type, slots and what was said; the action under consideration; back comes a verdict with the rule's own words and support.",
+   "crosses": "paid",
+   "synchronous": true
+  },
+  {
+   "from": "live-observer",
+   "to": "jev",
+   "mechanism": "in-process call",
+   "summary": "observe, or fall back by name",
+   "what_crosses": "Redacted request text; unreachable, budget spent or stale calibration each resolve to no observation and a logged reason.",
+   "crosses": "vendor"
+  },
+  {
+   "from": "live-observer",
+   "to": "advisor",
+   "mechanism": "in-process call",
+   "summary": "advise(), with observations",
+   "what_crosses": "The pure call, with observed facts merged under slots, intent and the caller's facts — so nothing an observation adds can displace a fact already there."
+  },
+  {
+   "from": "live-observer",
+   "to": "store",
+   "mechanism": "database",
+   "summary": "observer and p, never text",
+   "what_crosses": "Which observer answered and every observation with its probability. Never the text."
+  }
+ ],
+ "questions": [
+  {
+   "id": "free-half",
+   "title": "What can somebody run without buying anything?",
+   "ask": "A stranger installs the free half and points it at their own logs. What actually happens, and what does it need?",
+   "answer": "It reads the transcripts the agent already wrote, types every event through a reviewed alphabet, and counts how often each written rule was kept — with no store, no adjudication, no model call and no network. The report leads with what the alphabet could not name, because a figure measured over the share of actions a parser happened to understand is not a measurement.",
+   "involves": [
+    "corpora",
+    "adapters",
+    "alphabet",
+    "pipeline",
+    "contracts",
+    "checker",
+    "report",
+    "lens-cli"
+   ],
+   "highlight": [
+    "lens-cli",
+    "report"
+   ],
+   "facts": [
+    "no-network",
+    "unknown-rate",
+    "cannot-answer"
+   ],
+   "omits": "The ports and their polyness implementation, which the pipeline uses; and the miner, which this path never touches."
+  },
+  {
+   "id": "licence-line",
+   "title": "Where does the licence boundary run?",
+   "ask": "Two licences, four repositories. Which components sit on which side, and what stops the line moving?",
+   "answer": "The free half is the whole front of the system — record, alphabet, adapters, ports, pipeline and the report. The paid half is everything that turns a corpus into rules nobody wrote down. Exactly two edges cross, both from the free half into the paid one, and nothing crosses back: polyx depends on polyx-lens and polyx-lens imports nothing from polyx. That direction is checked by the build, which is what makes the split a fact rather than a claim. The vendored library underneath keeps its own Apache-2.0 licence. A third line was added for the vendor adapter: MIT, one directory, and the only code in either package that can make a network call.",
+   "involves": [
+    "polyness",
+    "ports",
+    "pipeline",
+    "miner",
+    "store",
+    "jev"
+   ],
+   "highlight": [
+    "miner",
+    "pipeline"
+   ],
+   "facts": [
+    "one-way",
+    "keys-never-ship",
+    "boundary-checked",
+    "apache-libs",
+    "vendor-confined"
+   ],
+   "omits": "The adapters, alphabet, contracts, checker and report sit inside the free half with the pipeline; the reviewer, advisor, evaluator and diff sit with the miner; the answer keys have a question of their own."
+  },
+  {
+   "id": "corpus-to-gate",
+   "title": "How does a rule get from a corpus to a gate?",
+   "ask": "What happens to one obligation between the recorded work and the moment it fires before a consequential action?",
+   "answer": "The corpus is typed by a reviewed alphabet and cut into tasks by a segmenter. The miner proposes a rule with its support and the records that contradict it. A person marks it real, not_real or narrowed, and only what they marked real is ever served. At a decision point the advisor answers with three values, not two: it fires, it does not apply, or a fact is missing and it says so rather than assuming the fact is false.",
+   "involves": [
+    "corpora",
+    "pipeline",
+    "miner",
+    "store",
+    "reviewer",
+    "advisor"
+   ],
+   "highlight": [
+    "reviewer",
+    "advisor"
+   ],
+   "facts": [
+    "human-gate",
+    "three-valued",
+    "deterministic",
+    "identity",
+    "recorded-once"
+   ],
+   "omits": "The adapters, the alphabet and the ports that cut a session into tasks; and the evaluator, which measures rather than serves. The observation path, which has its own question below."
+  },
+  {
+   "id": "answer-keys",
+   "title": "Which written rules may be shipped, and which never?",
+   "ask": "The evaluation is scored against hand-decomposed rulebooks. Where do those live, and why are they not in the product?",
+   "answer": "A clause set decomposes somebody else’s written rules so the miner can be scored against them. Two repositories hold them, split by whether the source rulebook is public: benchmark decompositions can be read by anyone checking a published figure, and anything derived from a private corpus is licensed to nobody. Neither is reachable from the mining side.",
+   "involves": [
+    "bench-keys",
+    "eval-keys",
+    "evaluator",
+    "miner",
+    "contracts"
+   ],
+   "highlight": [
+    "bench-keys",
+    "eval-keys"
+   ],
+   "facts": [
+    "keys-never-ship",
+    "contracts-are-not-keys"
+   ],
+   "omits": "The three-region diff and the serving path — the advisor never sees a clause set."
+  },
+  {
+   "id": "model-boundary",
+   "title": "Where can a model be called, and where can it not?",
+   "ask": "polyx now integrates a model that reads text. Where exactly can that model be consulted, where can it not, and what keeps it there?",
+   "context": "Every mining figure polyx quotes reproduces byte for byte from a corpus, an alphabet and a threshold set. A model call is not bit-stable — the vendor's own description is 'similar answers for similar inputs' — so one call anywhere in the mining path would end that guarantee outright. At the same time, the largest loss in coverage is that a rule cannot be conditioned on anything nobody typed, and in a conversation most of what decides the next action was said. The integration has to give the miner what was said without ever letting it ask.",
+   "answer": "In one place, for mining: the annotation pass asks it once per distinct redacted text and writes the answers to a digested file, and the miner reads that file as data — check:boundary fails the build if anything under src/mine could import the port. The free half defines the port, holds the predicates, the redaction profile and the store, and can reach nothing: check:offline fails its build on any code that could. The vendor sits in one MIT directory, and the response names the model that answered, so a later drift is a model change and not a mystery.",
+   "involves": [
+    "predicates",
+    "text-profile",
+    "annotator",
+    "jev",
+    "vendor-api",
+    "annotations",
+    "miner"
+   ],
+   "highlight": [
+    "jev",
+    "annotations"
+   ],
+   "facts": [
+    "recorded-once",
+    "vendor-confined",
+    "may-not-assert-absence",
+    "separation-gate",
+    "dated-model",
+    "labelling-cost"
+   ],
+   "omits": "The live path — the second place the model is called — which has its own question next; calibration, which is how a predicate earns the right to be asked; and the advisor.",
+   "narrative": "Start at the predicate set on the left. A predicate is a declared yes/no question — 'does this message state the customer was charged twice?' — reviewed and versioned like the alphabet, and it declares its quadrant. The one kind of question the loader refuses is a question about what happened in the world over a record that may not mention it, because measured on twelve such cases the model answered from the record's silence every time and was right half the time. Everything below rests on asking only what a text states.\n\nThe annotation pass is the first of the two places the model is consulted. It resolves every site a real, calibrated predicate could read, redacts the text under the corpus's profile — the preview of exactly what would leave the machine is written before a key exists — groups by distinct text so templated messages collapse to one call, asks once per text with the whole battery, and writes one line per site and predicate to the annotation store. A withheld answer is a written line, not a missing one. The file is sorted, digested, and the digest is pinned in the run manifest beside the corpus revision.\n\nThe miner reads that file and never the port. That is not a convention: check:boundary fails the build if anything under src/mine imports the Observer. An observed fact is lifted into an instance's fact base from the sites before it, as a slot value is, and a withheld observation counts as evidence that the predicate was asked — which is what lets an assert-only fact, which never takes a second value, be a candidate condition at all.\n\nThe vendor sits in one directory under MIT. Nothing outside it may import a Jev symbol, name the package, or read the key; the free half, which defines the port, can make no network call under any configuration. A second System One implementation, or a local classifier, drops in behind the same interface and nothing above it changes."
+  },
+  {
+   "id": "observation-invariant",
+   "title": "What can an observation do to a verdict?",
+   "ask": "A request from an agent may now carry what was said. When the model reads it, what can change in the answer — and what is guaranteed not to?",
+   "context": "The live path is the second of the two places the model is consulted, and the one a bank will ask about: a fact the model produced is about to influence whether an action is warned against. The guarantee has to be about the shape of the change, not the accuracy of the model, because the model's accuracy is exactly what a reviewer has not yet verified.",
+   "answer": "An observation can surface a warning that was hidden behind an unknown fact, and can turn an abstention into an answer. It cannot withdraw a warning, cannot create an abstention, and cannot move a verdict backwards. This is a consequence of one merge order rather than a promise: observed facts enter the fact base first, under the slots, the inferred intent and the caller's own facts, so a condition that was already decided is untouched and only an unknown can move. The advisor itself is not changed — it is called with one more argument, synchronously, after the HTTP layer has resolved observations. If the observer is unreachable the request is answered as before and the log says so by name.",
+   "involves": [
+    "agent-hook",
+    "live-observer",
+    "jev",
+    "obs-port",
+    "advisor"
+   ],
+   "highlight": [
+    "live-observer",
+    "advisor"
+   ],
+   "facts": [
+    "invariant",
+    "fails-open",
+    "may-not-assert-absence",
+    "human-gate",
+    "three-valued"
+   ],
+   "omits": "The store, which receives which observer answered and every observation with its probability (never the text); the annotation pass and the miner, which the previous question covers; text redaction, which happens inside live resolution before anything is sent.",
+   "narrative": "The live path is the second place. A request may carry what was said at each event; the server redacts and observes it before the advisor is called, so the advisor itself stays synchronous and pure. Whatever comes back enters the fact base first, under the slots, the inferred intent and the caller's own facts. That order is the whole safety argument: a condition that was already decided cannot be changed by adding keys, so only an unknown can move, and verdicts go one way. If the observer is unreachable, the request is answered over typed state and the log says so by name.\n\nThe hook on the left is an agent's runtime asking before it acts — Claude Code's PreToolUse seam, here. It types the session so far exactly as the corpus was typed and sends the events with what was said at each. It depends on the free half to do the typing and on loopback HTTP to reach the advisor; nothing about polyx is in the agent's process.\n\nLive resolution is where the text goes first. It is redacted under the corpus profile, the predicates that read it are grouped by text, and the observer is asked once per text. Whatever comes back is re-derived through the predicate's own bands — the arithmetic is the one place a probability becomes a fact, and an observer is not trusted to have done it. Then the advisor is called with the request and the observations, and it does what it always did.\n\nThe store gets which observer answered and every observation with its probability, and never the text. The log is thereby a growing annotation file for live traffic, replayable later with no key.\n\nWhat the diagram cannot show is the property test: every decision point of the synthetic corpus, sixty random rule sets, random observation sets that withhold, assert and refute over every fact a rule could mention, including collisions with slot and caller facts — eight thousand checks that no warning is withdrawn, no abstention created, no verdict moved backwards. With observations applied last instead of first, it goes red."
+  }
+ ],
+ "facts": [
+  {
+   "id": "deterministic",
+   "kind": "guarantee",
+   "claim": "No LLM call anywhere in the mining path",
+   "because": "the same corpus, alphabet and thresholds must give a byte-identical rule set, or no figure can be reproduced and no rule can be argued with",
+   "evidence": [
+    {
+     "path": "src/mine/index.ts",
+     "label": "stated at the top of mine()"
+    }
+   ]
+  },
+  {
+   "id": "human-gate",
+   "kind": "doctrine",
+   "claim": "Nothing is served that a person has not adjudicated real",
+   "because": "a mined regularity is a proposal; some are norms, some are habits, and some are artefacts of how work is scheduled, and only a human can tell which",
+   "evidence": [
+    {
+     "path": "README.md",
+     "label": "the standing rules"
+    }
+   ]
+  },
+  {
+   "id": "three-valued",
+   "kind": "guarantee",
+   "claim": "An absent fact is unknown, never false",
+   "because": "no record of a verification is not the same as no verification, and in a bank that difference is the product",
+   "evidence": [
+    {
+     "path": "src/serve/advisor.ts",
+     "label": "abstain: uncovered or unknown_fact"
+    }
+   ]
+  },
+  {
+   "id": "one-way",
+   "kind": "constraint",
+   "claim": "The free half imports nothing from the paid half",
+   "because": "a licence split that is only written down is a promise; one that is a dependency direction can be checked by anybody who reads the build",
+   "evidence": [
+    {
+     "path": "LICENSING.md",
+     "label": "the split"
+    }
+   ]
+  },
+  {
+   "id": "keys-never-ship",
+   "kind": "constraint",
+   "claim": "An answer key is never distributed to anyone",
+   "because": "a shipped answer key is a shipped evaluation, and the decompositions are months of judgement rather than code",
+   "evidence": [
+    {
+     "path": "scripts/check-shippable.mjs",
+     "label": "the tree may not contain one"
+    }
+   ]
+  },
+  {
+   "id": "boundary-checked",
+   "kind": "guarantee",
+   "claim": "Two build checks, because unreachable and absent are different",
+   "because": "check-boundary proves no module READS an answer key, which says nothing about what a git archive contains; check-shippable is the other half",
+   "evidence": [
+    {
+     "path": "scripts/check-boundary.mjs"
+    },
+    {
+     "path": "scripts/check-shippable.mjs"
+    }
+   ]
+  },
+  {
+   "id": "redaction",
+   "kind": "guarantee",
+   "claim": "Free text never reaches a stored artefact",
+   "because": "command bodies, file contents and prompts hold paths, credentials and customer data, so only the verb and a redacted path survive ingestion"
+  },
+  {
+   "id": "unknown-rate",
+   "kind": "doctrine",
+   "claim": "The unknown rate is printed before any finding",
+   "because": "the shell parser once dropped two thirds of a corpus's pushes while reporting 1.4% unknown — a rate measured over what the parser understood is not a measurement",
+   "evidence": [
+    {
+     "path": "docs/polyx-technical-spec.md",
+     "label": "§15 rev. 15"
+    }
+   ]
+  },
+  {
+   "id": "cannot-answer",
+   "kind": "tradeoff",
+   "claim": "The free half cannot find a rule nobody wrote down",
+   "because": "everything it reports is measured against clauses that already exist, and the unwritten regularities are what the miner is for — the report says so rather than implying coverage it lacks"
+  },
+  {
+   "id": "identity",
+   "kind": "guarantee",
+   "claim": "A verdict given last week still applies to the rule mined today",
+   "because": "rule identity is derived from the claim rather than from the run, so re-mining does not orphan a human decision",
+   "evidence": [
+    {
+     "path": "src/store/rules.ts"
+    }
+   ]
+  },
+  {
+   "id": "contracts-are-not-keys",
+   "kind": "constraint",
+   "claim": "A contract set ships; an answer key does not",
+   "because": "a contract set decomposes what a harness publishes about itself, so it holds for every installation and gives a first run something true to say — same shape, opposite purpose"
+  },
+  {
+   "id": "no-network",
+   "kind": "guarantee",
+   "claim": "The free half contains no network code at all",
+   "because": "nothing leaves the machine has to be inspectable rather than promised, and a corpus that must be uploaded is a corpus nobody will hand over"
+  },
+  {
+   "id": "apache-libs",
+   "kind": "doctrine",
+   "claim": "The low-level libraries stay Apache-2.0; nothing built on them does",
+   "because": "polyness is a general library and its licence is deliberate, while the products are sold — Apache explicitly permits inclusion in a work under other terms, provided attribution travels",
+   "evidence": [
+    {
+     "path": "NOTICE",
+     "label": "the attribution that travels"
+    }
+   ]
+  },
+  {
+   "id": "may-not-assert-absence",
+   "kind": "doctrine",
+   "claim": "A model may add a fact and may never assert an absence",
+   "because": "asked whether income was verified over twelve records equally silent about it, the model answered not-verified twelve times and was right half the time — the closed-world assumption applied perfectly to a partial record; asked whether the text states it, twelve of twelve",
+   "evidence": [
+    {
+     "path": "docs/polyx-jev-integration-spec.md",
+     "label": "JF2.3, JF2.4"
+    }
+   ]
+  },
+  {
+   "id": "invariant",
+   "kind": "guarantee",
+   "claim": "Observation never withdraws a warning and never creates an abstention",
+   "because": "observed facts enter the fact base first, under everything else, so a condition already decided is unaffected and only an unknown can move; verdicts go one way, abstain to clear to recommend to warn",
+   "evidence": [
+    {
+     "path": "test/invariant.test.ts",
+     "label": "eight thousand randomised checks; goes red if the order is reversed"
+    },
+    {
+     "path": "src/serve/advisor.ts",
+     "label": "factsAt — the merge order is the invariant"
+    }
+   ]
+  },
+  {
+   "id": "recorded-once",
+   "kind": "guarantee",
+   "claim": "The model is called in a separate pass and mining reads the recording",
+   "because": "a call is not bit-stable — the vendor says similar answers for similar inputs — so byte-for-byte reproducibility requires a pinned file, digested like corpusRevision",
+   "evidence": [
+    {
+     "path": "scripts/check-boundary.mjs",
+     "label": "src/mine cannot import the port"
+    }
+   ]
+  },
+  {
+   "id": "vendor-confined",
+   "kind": "guarantee",
+   "claim": "The vendor is reachable from one directory and the free half can reach nothing",
+   "because": "swapping the vendor must change nothing above the port, and the free half's whole claim is that nothing leaves the machine",
+   "evidence": [
+    {
+     "path": "scripts/check-boundary.mjs",
+     "label": "JT1.1, JT1.2"
+    }
+   ]
+  },
+  {
+   "id": "bands-derived",
+   "kind": "doctrine",
+   "claim": "Bands are derived from a labelled sample, never typed",
+   "because": "a hand-set threshold is a closed-world assumption wearing a number; the labeller is never shown the model's answer, so the label is a judgement and not an agreement",
+   "evidence": [
+    {
+     "path": "src/ports/jev/calibrate.ts",
+     "label": "p is absent until every verdict is in"
+    }
+   ]
+  },
+  {
+   "id": "separation-gate",
+   "kind": "constraint",
+   "claim": "A predicate whose labels separate by less than 0.20 is refused before any band is drawn",
+   "because": "with the prompt stating outright that the record might be incomplete, a question about the world still separated its labels by 0.037 — three quantisation steps; the information was never in the text",
+   "evidence": [
+    {
+     "path": "docs/polyx-jev-implementation-plan.md",
+     "label": "A4"
+    }
+   ]
+  },
+  {
+   "id": "labelling-cost",
+   "kind": "tradeoff",
+   "claim": "A predicate costs fifteen positives divided by its base rate, not sixty labels",
+   "because": "the first low-base-rate predicate came back ten yes in sixty; the reviewer's hour is the budget and it is spent on the no's — stratify the draw, or expect to redraw",
+   "evidence": [
+    {
+     "path": "docs/polyx-jev-implementation-plan.md",
+     "label": "results so far"
+    }
+   ]
+  },
+  {
+   "id": "dated-model",
+   "kind": "risk",
+   "claim": "The vendor's model can move under jev-latest",
+   "because": "the response names the model that answered, so every annotation line carries it, the predicate set pins it, and a diff distinguishes a model change from jitter — but nothing prevents the vendor from retiring a version",
+   "evidence": [
+    {
+     "path": "src/ports/jev/client.ts",
+     "label": "model passed up from the response"
+    }
+   ]
+  },
+  {
+   "id": "fails-open",
+   "kind": "tradeoff",
+   "claim": "The live path fails open",
+   "because": "an unreachable observer yields an abstention where an answer might have been, which is the correct failure direction; a hook that blocked every tool when the advisor was down would be hostile",
+   "evidence": [
+    {
+     "path": "src/serve/observe.ts",
+     "label": "never throws"
+    },
+    {
+     "path": "examples/claude-code-hook/polyx-hook.mjs",
+     "label": "POLYX_HOOK_STRICT to fail closed"
+    }
+   ]
+  }
+ ],
+ "glossary": [
+  {
+   "term": "observation port",
+   "definition": "The interface between polyx and a model that reads text: a function from (text, declared predicate) to a fact, or to nothing. It never decides a verdict."
+  },
+  {
+   "term": "predicate",
+   "definition": "A declared, reviewed yes/no question a model may be asked about a text, producing a fact named obs.<name>. Inert until calibrated.",
+   "also": [
+    "predicate set"
+   ]
+  },
+  {
+   "term": "withheld",
+   "definition": "The model's probability fell between the bands, so no fact is emitted. Recorded as a line with value null; the advisor sees unknown, never false.",
+   "also": [
+    "withholding"
+   ]
+  },
+  {
+   "term": "bands",
+   "definition": "Two thresholds per predicate: at or above assertAt emit true; at or below refuteAt emit false; between, withhold. Derived from a labelled sample, never set by hand.",
+   "also": [
+    "assertAt",
+    "refuteAt"
+   ]
+  },
+  {
+   "term": "assert-only",
+   "definition": "A predicate whose refuteAt is unreachable, so it can contribute a true and never a false. The required setting wherever 'the text does not say so' must not become 'it did not happen'."
+  },
+  {
+   "term": "quadrant",
+   "definition": "Which of four kinds of question a predicate asks: does the text decide or the sequence, and does silence mean no or unknown. Only 'text, unknown' is fully admissible; 'sequence, unknown' is refused at load.",
+   "also": [
+    "fourth quadrant",
+    "sequence-unknown"
+   ]
+  },
+  {
+   "term": "annotation",
+   "definition": "One recorded model answer for one (site, predicate): its probability, the fact emitted or null, the predicate-set version, the redaction profile, the text hash, and the model that answered.",
+   "also": [
+    "annotation store",
+    "annotation file"
+   ]
+  },
+  {
+   "term": "calibration",
+   "definition": "Labelling a sample of the corpus by hand, then measuring the model against the labels to derive bands. The labeller never sees the model's answer."
+  },
+  {
+   "term": "label separation",
+   "definition": "Mean probability on items labelled yes minus mean on items labelled no. Below 0.20 the predicate is refused: the answer was not in the text.",
+   "also": [
+    "A4"
+   ]
+  },
+  {
+   "term": "decision point",
+   "definition": "An episode with a consequential action: the moment the advisor is asked, with what was known before the action."
+  },
+  {
+   "term": "three-valued",
+   "definition": "A condition is true, false, or unknown. A fact absent from the record is unknown, never false. The closed-world assumption is prohibited."
+  },
+  {
+   "term": "System One model",
+   "definition": "A model built for fast, calibrated structured decisions rather than text generation; Jev, from TypeSafe, is the one polyx integrates.",
+   "also": [
+    "Jev"
+   ]
+  }
+ ]
+}

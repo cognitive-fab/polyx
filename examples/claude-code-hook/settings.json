@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Edit|Write|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node /absolute/path/to/polyx/examples/claude-code-hook/polyx-hook.mjs",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}
