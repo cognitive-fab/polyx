@@ -39,6 +39,9 @@ session.
    re-implements how a Bash command is split or how a verb is recognised; the
    pending call is typed exactly as it would have been typed after the fact,
    and "the episode so far" is the same object the rules were mined over.
+   A subagent is read from its own transcript, `<session>/subagents/agent-<id>.jsonl`,
+   not the session's: against the session's, a subagent's edit to a file it
+   had just written looked like an edit to a file nobody had opened.
 3. One `POST /advise` per considered action, carrying the episode, the whole
    session so far as types and slots, and the considered action's own slots.
    The session is what a rule measured over the contact is checked against

@@ -27,8 +27,8 @@
 //   POLYX_ALPHABET      default: the alphabet.cc.yaml shipped with polyx-lens
 //   POLYX_OPERATOR      default: the project the transcript belongs to
 //   POLYX_HOOK_STRICT   1 to block when the advisor cannot be reached
-import { readFileSync } from 'node:fs';
-import { basename, dirname } from 'node:path';
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { basename, dirname, join } from 'node:path';
 import { applyAlphabet, builtinAlphabet, ccTextSource, loadAlphabet, projectOf, segmenterFor, toRaw } from '@cognitive-fab/polyx-lens';
 
 const ADVISOR = (process.env.POLYX_ADVISOR_URL ?? 'http://127.0.0.1:7777').replace(/\/$/, '');
@@ -38,6 +38,37 @@ async function readStdin() {
   const chunks = [];
   for await (const c of process.stdin) chunks.push(c);
   return JSON.parse(Buffer.concat(chunks).toString('utf8') || '{}');
+}
+
+/**
+ * The transcript the pending call belongs to.
+ *
+ * A subagent keeps its own transcript, beside the session's under
+ * `<session>/subagents/agent-<id>.jsonl`, while `transcript_path` names the
+ * session's. Read against the session's, a subagent's edit to a file it had
+ * just written and read was an edit to a file "nothing in the session read or
+ * wrote": in a polyflow session the same-file rule refused a subagent eight
+ * edits in a row to its own new file, and the subagent routed around the gate
+ * with a Python script — a false positive that taught an agent to evade.
+ *
+ * `agent_id` names the subagent when Claude Code sends it. Otherwise the call
+ * is found by its `tool_use_id`, which is already in whichever transcript it
+ * belongs to by the time the hook runs.
+ */
+function transcriptOf(hook) {
+  const main = hook.transcript_path;
+  const dir = join(dirname(main), basename(main, '.jsonl'), 'subagents');
+  if (hook.agent_id) {
+    const own = join(dir, `agent-${hook.agent_id}.jsonl`);
+    if (existsSync(own)) return own;
+  }
+  const id = hook.tool_use_id && `"${hook.tool_use_id}"`;
+  if (!id || !existsSync(dir) || readFileSync(main, 'utf8').includes(id)) return main;
+  const agents = readdirSync(dir)
+    .filter((f) => f.startsWith('agent-') && f.endsWith('.jsonl'))
+    .map((f) => join(dir, f))
+    .sort((a, b) => statSync(b).mtimeMs - statSync(a).mtimeMs);
+  return agents.find((f) => readFileSync(f, 'utf8').includes(id)) ?? main;
 }
 
 /**
@@ -52,9 +83,17 @@ async function readStdin() {
  * considerations.
  */
 async function episodeSoFar(hook, alphabet) {
-  const transcript = readFileSync(hook.transcript_path, 'utf8');
-  const lines = transcript.split('\n');
+  const path = transcriptOf(hook);
+  const transcript = readFileSync(path, 'utf8');
+  let lines = transcript.split('\n');
   while (lines.length && !lines[lines.length - 1]) lines.pop();
+  // The pending call is already recorded when the hook runs. Left in, it is
+  // typed twice, and "at most once per episode" warns on the first push as a
+  // second one. Everything from its record on has not happened yet.
+  if (hook.tool_use_id) {
+    const at = lines.findIndex((l) => l.includes(`"${hook.tool_use_id}"`));
+    if (at >= 0) lines = lines.slice(0, at);
+  }
   const pendingLine = lines.length;
   const pending = JSON.stringify({
     type: 'assistant',
@@ -62,7 +101,7 @@ async function episodeSoFar(hook, alphabet) {
     message: { role: 'assistant', content: [{ type: 'tool_use', name: hook.tool_name, input: hook.tool_input ?? {} }] },
   });
   const project = process.env.POLYX_OPERATOR ?? projectOf(basename(dirname(hook.transcript_path)));
-  const raw = toRaw([...lines, pending].join('\n'), hook.transcript_path, project);
+  const raw = toRaw([...lines, pending].join('\n'), path, project);
   if (!raw) return { operator: project, before: [], contact: [], considering: [] };
   const typed = applyAlphabet(alphabet, raw);
   // The same segmenter the corpus was mined under: an obligation is measured

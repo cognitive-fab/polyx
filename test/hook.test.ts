@@ -5,6 +5,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { spawn } from 'node:child_process';
+import { copyFileSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fixturesDir, loadAlphabet, builtinAlphabet, recommendableTypes, type Rule } from '@cognitive-fab/polyx-lens';
 import { startAdvisorServer } from '../src/serve/http.ts';
@@ -143,6 +145,62 @@ test('the same-file rule blocks an edit to a file the session never opened, and 
   } finally {
     await srv.close();
     ws.cleanup();
+  }
+});
+
+test('a subagent is judged on its own transcript: an edit to the file it just wrote is not a guess', async () => {
+  const ws = tempWorkspace();
+  const home = mkdtempSync(join(tmpdir(), 'hook-subagent-'));
+  const store = openStore(ws.config.dbPath);
+  const manifest = { runId: 'r', command: 'mine', at: 0, corpus: 'cc-sample', corpusRevision: 'x', alphabetVersion: 1, alphabetFile: 'x', thresholds: ws.thresholds, seed: 1, codeCommit: null, segmenter: 'polyness' };
+  store
+    .prepare('INSERT INTO runs (id, command, at, corpus, corpus_revision, alphabet_version, thresholds_json, seed, code_commit, manifest_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+    .run(manifest.runId, manifest.command, manifest.at, manifest.corpus, manifest.corpusRevision, manifest.alphabetVersion, JSON.stringify(ws.thresholds), 1, null, JSON.stringify(manifest));
+  persistMined(store, manifest, [EDIT_NEEDS_SAME_FILE], [], ws.thresholds);
+  store.close();
+  const alphabet = loadAlphabet(builtinAlphabet('alphabet.cc.yaml')!);
+  const srv = await startAdvisorServer({ dbPath: ws.config.dbPath, corpus: 'cc-sample', recommendable: recommendableTypes(alphabet) });
+  try {
+    // The session's transcript, and beside it a subagent's, as Claude Code lays them out.
+    const project = join(home, 'C--Users-sample-code-ledger-api');
+    const agents = join(project, 'bbbb2222', 'subagents');
+    mkdirSync(agents, { recursive: true });
+    const main = join(project, 'bbbb2222.jsonl');
+    copyFileSync(TRANSCRIPT, main);
+    const rec = (o: object) => JSON.stringify({ sessionId: 'bbbb2222', promptId: 'p9', timestamp: '2026-05-04T10:00:00.000Z', ...o });
+    const call = (id: string, name: string, input: object) => rec({ type: 'assistant', message: { role: 'assistant', content: [{ type: 'tool_use', id, name, input }] } });
+    // The subagent writes a file nobody else has touched, and its next edit is
+    // already recorded when the hook runs — which is how Claude Code writes it.
+    writeFileSync(
+      join(agents, 'agent-a2b213fe.jsonl'),
+      [
+        rec({ type: 'user', message: { role: 'user', content: 'write the inventory' } }),
+        call('toolu_w', 'Write', { file_path: 'docs/inventory.md', content: 'x' }),
+        rec({ type: 'user', message: { role: 'user', content: [{ type: 'tool_result', tool_use_id: 'toolu_w', is_error: false }] } }),
+        call('toolu_e', 'Edit', { file_path: 'docs/inventory.md', old_string: 'x', new_string: 'y' }),
+      ].join('\n') + '\n',
+    );
+    const env = { POLYX_ADVISOR_URL: srv.url };
+    const edit = (extra: Record<string, unknown>) => ({ hook_event_name: 'PreToolUse', session_id: 'bbbb2222', transcript_path: main, tool_name: 'Edit', tool_input: { file_path: 'docs/inventory.md', old_string: 'x', new_string: 'y' }, cwd: '/tmp', tool_use_id: 'toolu_e', ...extra });
+
+    // Named by agent_id, and found by tool_use_id when it is not: both allowed.
+    for (const extra of [{ agent_id: 'a2b213fe' }, {}]) {
+      const r = await run(edit(extra), env);
+      assert.equal(r.status, 0, `${JSON.stringify(extra)}: ${r.stderr}`);
+    }
+    // The same edit judged against the session's transcript — what the hook
+    // did before — is refused: the session never saw the file.
+    const blind = await run({ ...edit({}), tool_use_id: 'toolu_not_recorded' }, env);
+    assert.equal(blind.status, 2, blind.stderr);
+
+    const log = openStore(ws.config.dbPath);
+    const verdicts = log.prepare("SELECT verdict FROM decision_points WHERE considering = 'action:edit_file' ORDER BY id").all().map((r) => (r as { verdict: string }).verdict);
+    log.close();
+    assert.deepEqual(verdicts, ['clear', 'clear', 'warn']);
+  } finally {
+    await srv.close();
+    ws.cleanup();
+    rmSync(home, { recursive: true, force: true });
   }
 });
 
