@@ -56,7 +56,7 @@ test suite runs every command on that page.
 ```
 node bin/polyx.mjs predicates synthetic-observable
 node bin/polyx.mjs annotate synthetic-observable --dry-run       # the redacted payloads; sends nothing
-node bin/polyx.mjs annotate synthetic-observable --import node_modules/polyx-lens/fixtures/synthetic-observable/synthetic-observable@1.jsonl
+node bin/polyx.mjs annotate synthetic-observable --import node_modules/@cognitive-fab/polyx-lens/fixtures/synthetic-observable/synthetic-observable@1.jsonl
 node bin/polyx.mjs mine synthetic-observable --threshold minInstances=3
 node bin/polyx.mjs coverage synthetic-observable                 # 5 abstentions resolved; nothing else can move
 ```

@@ -104,7 +104,7 @@ Without a key, install the recording that ships with the fixture. It was
 produced by a stub that reads the text for real:
 
 ```
-$ polyx annotate synthetic-observable --import node_modules/polyx-lens/fixtures/synthetic-observable/synthetic-observable@1.jsonl
+$ polyx annotate synthetic-observable --import node_modules/@cognitive-fab/polyx-lens/fixtures/synthetic-observable/synthetic-observable@1.jsonl
 
 imported 30 recorded observation(s) for synthetic-observable — predicate set v1, digest 39e93b226b4ac904
 no call was made. mine, coverage and evaluate now read this file; the digest is in manifest annotate-…
