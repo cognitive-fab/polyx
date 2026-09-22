@@ -4,6 +4,8 @@ Mine the rules an agent's own history supports, and serve them back with abstent
 
 Source-available under the Business Source License 1.1, converting to Apache-2.0 four years after each version is published; production use within your own organisation is granted. The front half, `polyx-lens`, is Apache-2.0 and the Jev adapter is MIT. `LICENSING.md` says what is under which and why. This is not an open-source licence, and it is not called one. Contributions: `CONTRIBUTING.md`; vulnerabilities: `SECURITY.md`.
 
+![The polyx loop: transcripts are typed into events by a reviewed alphabet, mined into candidate rules, adjudicated by a person, and served back to the agent at the moment before it acts; every decision is logged and becomes the corpus for the next pass. A System One model can optionally annotate the corpus once so rules can be conditioned on what was said.](docs/polyx-loop.svg)
+
 - `docs/polyx-functional-spec.md` — what and why
 - `docs/polyx-technical-spec.md` — how
 - `docs/polyx-implementation-plan.md` — in what order, with gates
