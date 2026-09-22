@@ -6,7 +6,7 @@
     "quality_profile": "showcase",
     "repository": {
       "url": "https://github.com/cognitive-fab/polyx",
-      "revision": "c80a06871222274d79cdca0a645ee28567044f40"
+      "revision": "56b8e41381594feb5a006a65bb513e83b4634f08"
     },
     "views": [
       {
@@ -246,6 +246,27 @@
         474
       ],
       "variant": "emphasis"
+    },
+    {
+      "from": "corpora",
+      "to": "lens-cli",
+      "label": "read in place, no copy · file",
+      "fromSide": "top",
+      "toSide": "top",
+      "via": [
+        [
+          135,
+          16
+        ],
+        [
+          1095,
+          16
+        ]
+      ],
+      "labelAt": [
+        615,
+        22
+      ]
     }
   ],
   "cards": [
@@ -263,7 +284,7 @@
       "items": [
         "The ports and their polyness implementation, which the pipeline uses",
         "and the miner, which this path never touches",
-        "Connected but out of scope: Ports, Miner"
+        "Connected but out of scope: Ports, Miner, Claude Code, Agent hook"
       ]
     },
     {

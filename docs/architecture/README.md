@@ -2,9 +2,9 @@
 
 Mine the rules an agent's own history supports, put them in front of a person, and serve the ones they accept at the moment a consequential action is about to happen — abstaining rather than guessing when a fact is missing. A System One model may observe what was said, and may add a fact; it may never assert an absence.
 
-Analysed at [`c80a068`](https://github.com/cognitive-fab/polyx/tree/c80a06871222274d79cdca0a645ee28567044f40).
+Analysed at [`56b8e41`](https://github.com/cognitive-fab/polyx/tree/56b8e41381594feb5a006a65bb513e83b4634f08).
 
-**Read from.** src/mine/, src/store/, src/serve/, src/review/, src/evaluate/, src/diff/, scripts/check-*.mjs (code); polyx-bench: policies/, polyx-eval: policies/cc-policy.yaml (code); LICENSING.md, docs/polyx-technical-spec.md (document); polyx-lens: src/ports/observation.ts, src/ports/text.ts, src/ports/predicates.ts, src/ports/calibrate.ts, src/ports/annotations.ts, src/alphabet/text.ts, src/record.ts, src/alphabet/, src/ingest/, src/ports/, src/pipeline.ts, src/lens/ (code); src/ports/jev/, src/serve/observe.ts, src/serve/advisor.ts, scripts/check-boundary.mjs, scripts/check-notice.mjs, examples/ (code); docs/polyx-jev-integration-spec.md, docs/polyx-jev-implementation-plan.md (document).
+**Read from.** src/mine/, src/store/, src/serve/, src/review/, src/evaluate/, src/diff/, scripts/check-*.mjs (code); polyx-bench: policies/, polyx-eval: policies/cc-policy.yaml (code); LICENSING.md, docs/polyx-technical-spec.md (document); polyx-lens: src/ports/observation.ts, src/ports/text.ts, src/ports/predicates.ts, src/ports/calibrate.ts, src/ports/annotations.ts, src/alphabet/text.ts, src/record.ts, src/alphabet/, src/ingest/, src/ports/, src/pipeline.ts, src/lens/ (code); src/ports/jev/, src/serve/observe.ts, src/serve/advisor.ts, scripts/check-boundary.mjs, scripts/check-notice.mjs, examples/ (code); docs/polyx-jev-integration-spec.md, docs/polyx-jev-implementation-plan.md (document); corpora/link-cc.mjs, examples/claude-code-hook/, test/hook.test.ts; polyx-lens: src/lens/local.ts, src/cli.ts, src/ingest/cc.ts (code).
 
 > Generated from the analysis by archlens. Edit the analysis, never this file.
 
@@ -31,6 +31,10 @@ It reads the transcripts the agent already wrote, types every event through a re
 
 **Deliberately not shown.** The ports and their polyness implementation, which the pipeline uses; and the miner, which this path never touches.
 
+#### Terms used here
+
+- **transcript** — The JSONL file Claude Code writes for each session under ~/.claude/projects: every user turn, every tool call and every tool result, in order.
+
 ### Where does the licence boundary run?
 
 **Two licences, four repositories. Which components sit on which side, and what stops the line moving?**
@@ -54,6 +58,7 @@ The free half is the whole front of the system — record, alphabet, adapters, p
 
 - **predicate** — A declared, reviewed yes/no question a model may be asked about a text, producing a fact named obs.<name>. Inert until calibrated.
 - **System One model** — A model built for fast, calibrated structured decisions rather than text generation; Jev, from TypeSafe, is the one polyx integrates.
+- **transcript** — The JSONL file Claude Code writes for each session under ~/.claude/projects: every user turn, every tool call and every tool result, in order.
 
 ### How does a rule get from a corpus to a gate?
 
@@ -77,6 +82,7 @@ The corpus is typed by a reviewed alphabet and cut into tasks by a segmenter. Th
 #### Terms used here
 
 - **decision point** — An episode with a consequential action: the moment the advisor is asked, with what was known before the action.
+- **transcript** — The JSONL file Claude Code writes for each session under ~/.claude/projects: every user turn, every tool call and every tool result, in order.
 
 ### Which written rules may be shipped, and which never?
 
@@ -181,6 +187,52 @@ What the diagram cannot show is the property test: every decision point of the s
 - **calibration** — Labelling a sample of the corpus by hand, then measuring the model against the labels to derive bands. The labeller never sees the model's answer.
 - **decision point** — An episode with a consequential action: the moment the advisor is asked, with what was known before the action.
 - **System One model** — A model built for fast, calibrated structured decisions rather than text generation; Jev, from TypeSafe, is the one polyx integrates.
+- **PreToolUse** — The seam in Claude Code that runs a script before a tool call, with the tool's name and input on stdin. Exit code 2 blocks the call and returns the script's stderr to the model as text.
+- **transcript** — The JSONL file Claude Code writes for each session under ~/.claude/projects: every user turn, every tool call and every tool result, in order.
+
+### How does Claude Code integrate with polyx and polyx-lens?
+
+**A team already runs Claude Code. What does it take for polyx to read what their agents did, and for the agents to ask polyx before they act?**
+
+Claude Code is both the source of the corpus and the caller of the advisor, and it needs no modification for either. It already writes every session as a transcript, and it already has a seam that runs a script before a tool call. The integration is a question of what sits on each side of those two facts, and of which side of the licence line each piece lands on.
+
+Twice, through two doors that need no change to Claude Code. The first is read-only and free: the transcripts it already writes under ~/.claude/projects are the corpus. polyx-lens reads them in place and reports which of the rules the agent was given it actually kept — no store, no copy, no network, nothing of polyx installed. Freeze the same transcripts with link-cc and the miner proposes the rules it was never given; a person marks the ones they mean. The second door is live: a PreToolUse hook, sixty lines, that Claude Code runs before a tool call. It types the session so far with the same adapter, alphabet and segmenter the corpus was mined under, asks the advisor on loopback, and turns the verdict into an exit code — 2 blocks the tool and puts the rule, in its own words with its support, in front of the model. Nothing about polyx is imported into the agent's process, and the hook fails open.
+
+[Open the diagram](claude-code.architecture.html) — 10 components.
+
+| Component | Responsibility |
+|---|---|
+| **Claude Code** | Runs the agent, writes every session as a JSONL transcript under ~/.claude/projects, and hands a PreToolUse hook the tool it is about to call before calling it. |
+| **Corpora** | Holds the recorded work wherever it already is, because a corpus that has to leave the machine is a corpus nobody will hand over. |
+| **Ingest adapters** | Turns each source format into raw interactions with one pure function per format, each held to a field-level fixture test on hand-checked examples. |
+| **Alphabet** | Declares what every event is and what it costs to take back, as a reviewed artefact that is versioned and stamped on every figure derived from it. |
+| **polyx-lens** | Runs the whole free half against the transcripts the agent already wrote, with no configuration and no network call. |
+| **Miner** | Derives rules the corpus supports, each carrying its support, its provenance level and the records that contradict it. |
+| **Reviewer** | Puts one rule in front of a person with the records on both sides of it, and saves the verdict the moment it is given. |
+| **Advisor** | Answers at a decision point using only rules a person marked real, and abstains when a fact is missing rather than treating absence as falsehood; an observed fact enters the fact base first, under everything else, so observation can only add. |
+| **Live resolution** | On a request that carries text, redacts and observes it before the advisor is called, so the advisor stays synchronous and pure and every observation reaches the decision log with its probability. |
+| **Agent hook** | Asks the advisor before a tool runs, typing the session so far exactly as the corpus was typed, and turns the verdict into an exit code the agent's runtime understands. |
+
+**Deliberately not shown.** The report itself, which the lens CLI prints; the store, which logs every decision so the next mining pass is over what actually happened, including the times the model overrode the rule; the observation port, which the live path uses when a request carries text and a key is set; and the evaluation harness.
+
+#### The long read
+
+Start with Claude Code on the left, and notice that it does two things it was already doing. It writes a transcript of every session — every user turn, tool call and tool result, as JSONL under ~/.claude/projects — and it will run a script before any tool call if a hook is registered. polyx changes neither. Everything in this diagram sits on the far side of those two facts.
+
+The first door is the transcripts. polyx-lens reads them where they are: the cc adapter turns each session into typed events under the reviewed alphabet, the clause checker counts how often each contract the agent was given was kept, and the report says so. That whole path is Apache-2.0 and makes no network call under any configuration — the build fails if it could — so the honest description of the free half is that a team can point it at their own agents' history and get a compliance figure without installing polyx, sending anything anywhere, or talking to anyone.
+
+The miner needs the same transcripts to hold still. A corpus that changes while it is mined cannot produce a reproducible figure, so link-cc freezes a byte-identical copy as the private cc corpus, and the manifest records which revision. From there the miner proposes rules the agent was never given — with support, counter-evidence and provenance — and the reviewer marks the ones a person means. Nothing is served that a person has not marked real.
+
+The second door is the hook. When Claude Code is about to call a tool it hands the hook the transcript path, the tool name and its input. The hook appends the pending call to the transcript as one more record and runs the whole thing through the same adapter, alphabet and segmenter the corpus was mined under, so it never re-implements how a Bash command is split into segments, and 'the episode so far' is the object the rules were mined over. Then one request to the advisor per considered action, on loopback, and the verdict becomes an exit code. Exit 2 blocks the tool and feeds stderr to the model — the rule in its own words, with the number that backs it: not 'you may not push' but 'this held forty-one times out of forty-seven, and the thing it depends on has not happened yet'. Claude can run the tests and push, or push anyway if the user asks. What changed is that a rule that sat in a CLAUDE.md nobody was counting is now a number in front of the model at the moment it matters.
+
+The hook depends on the free half to type the transcript and on HTTP to reach the advisor; nothing about polyx is imported into the agent's process, and the licence line runs exactly where the diagram draws it. If the advisor is down the hook allows the call and says so once: a hook that blocked every tool when its advisor was unreachable would be hostile. And every decision the advisor gives is logged, so the next mining pass is over what actually happened — including the times the model overrode a rule and was right to.
+
+#### Terms used here
+
+- **observation port** — The interface between polyx and a model that reads text: a function from (text, declared predicate) to a fact, or to nothing. It never decides a verdict.
+- **decision point** — An episode with a consequential action: the moment the advisor is asked, with what was known before the action.
+- **PreToolUse** — The seam in Claude Code that runs a script before a tool call, with the tool's name and input on stdin. Exit code 2 blocks the call and returns the script's stderr to the model as text.
+- **transcript** — The JSONL file Claude Code writes for each session under ~/.claude/projects: every user turn, every tool call and every tool result, in order.
 
 ## Boundaries
 
@@ -198,6 +250,8 @@ Crossed by:
 - **Annotation pass → Annotation store** over file. One line per (site, predicate) with p, value or null, the set version, the redaction profile, the answering model.
 - **Miner → Annotation store** over file. Recorded facts lifted into each instance's fact base from the sites before it; the digest goes into the manifest beside corpusRevision.
 - **Calibration → Predicate sets** over manual. Bands derived from the labelled distribution, precision, withheld fraction, label separation — pasted in by a person and versioned.
+- **Claude Code → Corpora** over file. JSONL session files under ~/.claude/projects, copied byte-identical into the private cc corpus so a corpus does not change while it is mined.
+- **Agent hook → Ingest adapters** over in-process call. The pending call appended as one more record and the whole transcript run through the cc adapter, the alphabet and the same segmenter the corpus was mined under.
 
 ### polyx — BUSL 1.1
 
@@ -236,9 +290,9 @@ Crossed by:
 
 ### The agent's process
 
-*process boundary.* Nothing about polyx is imported here; the hook depends on the free half to type the transcript and on loopback HTTP to reach the advisor
+*process boundary.* The agent's own process and runtime: nothing about polyx is imported here; the hook depends on the free half to type the transcript and on loopback HTTP to reach the advisor
 
-Contains: Agent hook.
+Contains: Claude Code, Agent hook.
 
 ## Components
 
@@ -247,6 +301,10 @@ Contains: Agent hook.
 **Corpora** — Holds the recorded work wherever it already is, because a corpus that has to leave the machine is a corpus nobody will hand over.
 
 - Source: `polyx.config.json`
+
+**Claude Code** — Runs the agent, writes every session as a JSONL transcript under ~/.claude/projects, and hands a PreToolUse hook the tool it is about to call before calling it.
+
+- Source: `examples/claude-code-hook/settings.json`, `corpora/link-cc.mjs`
 
 ### Ingest and typing
 
@@ -1095,6 +1153,10 @@ Contains: Agent hook.
 | Live resolution | Jev adapter | in-process call | Redacted request text; unreachable, budget spent or stale calibration each resolve to no observation and a logged reason. *(crosses src/ports/jev — MIT)* |
 | Live resolution | Advisor | in-process call | The pure call, with observed facts merged under slots, intent and the caller's facts — so nothing an observation adds can displace a fact already there. |
 | Live resolution | Store | database | Which observer answered and every observation with its probability. Never the text. |
+| Claude Code | Corpora | file | JSONL session files under ~/.claude/projects, copied byte-identical into the private cc corpus so a corpus does not change while it is mined. *(crosses polyx-lens — free)* |
+| Claude Code | Agent hook | spawn | On stdin: the transcript path, the tool name and its input. Back: an exit code — 2 blocks the tool and feeds stderr to the model. |
+| Agent hook | Ingest adapters | in-process call | The pending call appended as one more record and the whole transcript run through the cc adapter, the alphabet and the same segmenter the corpus was mined under. *(crosses polyx-lens — free)* |
+| Corpora | polyx-lens | file | The free report reads ~/.claude/projects directly, with no store, no copy, no network, and no polyx installed. |
 
 ## Doctrines, guarantees and trade-offs
 
@@ -1105,6 +1167,7 @@ Contains: Agent hook.
 - **The low-level libraries stay Apache-2.0; nothing built on them does** polyness is a general library and its licence is deliberate, while the products are sold — Apache explicitly permits inclusion in a work under other terms, provided attribution travels
 - **A model may add a fact and may never assert an absence** asked whether income was verified over twelve records equally silent about it, the model answered not-verified twelve times and was right half the time — the closed-world assumption applied perfectly to a partial record; asked whether the text states it, twelve of twelve
 - **Bands are derived from a labelled sample, never typed** a hand-set threshold is a closed-world assumption wearing a number; the labeller is never shown the model's answer, so the label is a judgement and not an agreement
+- **Claude Code meets polyx at two doors, and the free one needs nothing installed but the lens** the transcripts it already writes are the corpus, so the free report runs over them in place; the hook is the second door, and it is sixty lines that depend only on the free half to type the session and on loopback HTTP to ask
 
 ### Guarantees
 

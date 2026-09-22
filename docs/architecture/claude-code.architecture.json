@@ -1,0 +1,419 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "How does Claude Code integrate with polyx and polyx-lens?",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/cognitive-fab/polyx",
+      "revision": "56b8e41381594feb5a006a65bb513e83b4634f08"
+    },
+    "views": [
+      {
+        "id": "answer",
+        "label": "How does Claude Code integrate with polyx and p…",
+        "focus": [
+          "claude-code",
+          "agent-hook",
+          "lens-cli"
+        ],
+        "note": "Twice, through two doors that need no change to Claude Code. The first is read-only and free: the transcripts it already writes under ~/.cl…"
+      },
+      {
+        "id": "free",
+        "label": "polyx-lens — free",
+        "focus": [
+          "lens-cli",
+          "adapters",
+          "alphabet"
+        ],
+        "note": "Everything here runs without buying anything, imports nothing from the paid half, and can make no network call under any configuration — th…"
+      },
+      {
+        "id": "paid",
+        "label": "polyx — BUSL 1.1",
+        "focus": [
+          "miner",
+          "reviewer",
+          "advisor",
+          "live-observer"
+        ],
+        "note": "Source-available, internal use granted, Apache-2.0 in four years: the half that turns a corpus into rules nobody wrote down, and the half t…"
+      },
+      {
+        "id": "agent",
+        "label": "The agent's process",
+        "focus": [
+          "claude-code",
+          "agent-hook"
+        ],
+        "note": "The agent's own process and runtime: nothing about polyx is imported here; the hook depends on the free half to type the transcript and on…"
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "claude-code",
+      "type": "external",
+      "label": "Claude Code",
+      "pos": [
+        60,
+        48
+      ],
+      "size": [
+        150,
+        62
+      ],
+      "sublabel": "transcr",
+      "sources": [
+        {
+          "path": "examples/claude-code-hook/settings.json",
+          "label": "the hook registration"
+        },
+        {
+          "path": "corpora/link-cc.mjs",
+          "label": "its transcripts, frozen as a corpus"
+        }
+      ]
+    },
+    {
+      "id": "corpora",
+      "type": "database",
+      "label": "Corpora",
+      "pos": [
+        60,
+        143
+      ],
+      "size": [
+        150,
+        62
+      ],
+      "sublabel": "gitignored, never",
+      "sources": [
+        {
+          "path": "polyx.config.json",
+          "label": "corpora are named, not stored"
+        }
+      ]
+    },
+    {
+      "id": "adapters",
+      "type": "backend",
+      "label": "Ingest adapters",
+      "pos": [
+        281,
+        238
+      ],
+      "size": [
+        150,
+        62
+      ],
+      "sublabel": "5 formats, 1 pure fn"
+    },
+    {
+      "id": "alphabet",
+      "type": "database",
+      "label": "Alphabet",
+      "pos": [
+        281,
+        302
+      ],
+      "size": [
+        150,
+        62
+      ],
+      "sublabel": "typing, redaction"
+    },
+    {
+      "id": "lens-cli",
+      "type": "frontend",
+      "label": "polyx-lens",
+      "pos": [
+        503,
+        270
+      ],
+      "size": [
+        150,
+        62
+      ],
+      "sublabel": "no arguments needed"
+    },
+    {
+      "id": "miner",
+      "type": "backend",
+      "label": "Miner",
+      "pos": [
+        724,
+        430
+      ],
+      "size": [
+        150,
+        62
+      ],
+      "sublabel": "patterns, provenance",
+      "sources": [
+        {
+          "path": "src/mine/index.ts",
+          "label": "mine()"
+        },
+        {
+          "path": "src/mine/patterns.ts",
+          "label": "the pattern table"
+        },
+        {
+          "path": "src/mine/facts.ts",
+          "label": "a withheld observation is evidence"
+        }
+      ]
+    },
+    {
+      "id": "reviewer",
+      "type": "frontend",
+      "label": "Reviewer",
+      "pos": [
+        946,
+        398
+      ],
+      "size": [
+        150,
+        62
+      ],
+      "sublabel": "one rule per screen",
+      "sources": [
+        {
+          "path": "src/review/server.ts",
+          "label": "the adjudication surface"
+        }
+      ]
+    },
+    {
+      "id": "advisor",
+      "type": "backend",
+      "label": "Advisor",
+      "pos": [
+        946,
+        462
+      ],
+      "size": [
+        150,
+        62
+      ],
+      "sublabel": "fire, warn, or abstain",
+      "sources": [
+        {
+          "path": "src/serve/advisor.ts",
+          "label": "forward chaining, three-valued"
+        },
+        {
+          "path": "src/serve/coverage.ts",
+          "label": "replayed over the corpus"
+        },
+        {
+          "path": "test/invariant.test.ts",
+          "label": "no warning withdrawn, no abstention created"
+        }
+      ]
+    },
+    {
+      "id": "live-observer",
+      "type": "backend",
+      "label": "Live resolution",
+      "pos": [
+        1167,
+        430
+      ],
+      "size": [
+        150,
+        62
+      ],
+      "sublabel": "before the pure",
+      "sources": [
+        {
+          "path": "src/serve/observe.ts",
+          "label": "never throws; falls back by name"
+        },
+        {
+          "path": "src/serve/http.ts",
+          "label": "resolved before advise()"
+        }
+      ]
+    },
+    {
+      "id": "agent-hook",
+      "type": "frontend",
+      "label": "Agent hook",
+      "pos": [
+        1167,
+        48
+      ],
+      "size": [
+        150,
+        62
+      ],
+      "sublabel": "PreToolUse, fails open",
+      "sources": [
+        {
+          "path": "examples/claude-code-hook/polyx-hook.mjs",
+          "label": "the hook"
+        },
+        {
+          "path": "test/hook.test.ts",
+          "label": "run as Claude Code runs it"
+        }
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "security-group",
+      "label": "polyx-lens — free",
+      "wraps": [
+        "lens-cli",
+        "adapters",
+        "alphabet"
+      ],
+      "pad": 20
+    },
+    {
+      "kind": "security-group",
+      "label": "polyx — BUSL 1.1",
+      "wraps": [
+        "miner",
+        "reviewer",
+        "advisor",
+        "live-observer"
+      ],
+      "pad": 20
+    },
+    {
+      "kind": "region",
+      "label": "The agent's process",
+      "wraps": [
+        "claude-code",
+        "agent-hook"
+      ],
+      "pad": 20
+    }
+  ],
+  "connections": [
+    {
+      "from": "corpora",
+      "to": "adapters",
+      "label": "read in place · file",
+      "labelAt": [
+        272,
+        151
+      ]
+    },
+    {
+      "from": "agent-hook",
+      "to": "live-observer",
+      "label": "POST /advise, with text · HTTP",
+      "labelAt": [
+        1242,
+        255
+      ],
+      "variant": "security"
+    },
+    {
+      "from": "live-observer",
+      "to": "advisor",
+      "label": "advise(), with observations",
+      "labelAt": [
+        1242,
+        506
+      ]
+    },
+    {
+      "from": "claude-code",
+      "to": "corpora",
+      "label": "transcripts, frozen by link-cc",
+      "labelAt": [
+        135,
+        124
+      ],
+      "variant": "security"
+    },
+    {
+      "from": "claude-code",
+      "to": "agent-hook",
+      "label": "PreToolUse: tool and transcript",
+      "fromSide": "top",
+      "toSide": "top",
+      "via": [
+        [
+          135,
+          16
+        ],
+        [
+          1242,
+          16
+        ]
+      ],
+      "labelAt": [
+        682,
+        31
+      ],
+      "variant": "emphasis"
+    },
+    {
+      "from": "agent-hook",
+      "to": "adapters",
+      "label": "types the session so far",
+      "labelAt": [
+        780,
+        39
+      ],
+      "variant": "security"
+    },
+    {
+      "from": "corpora",
+      "to": "lens-cli",
+      "label": "read in place, no copy · file",
+      "fromSide": "bottom",
+      "toSide": "bottom",
+      "via": [
+        [
+          135,
+          652
+        ],
+        [
+          578,
+          652
+        ]
+      ],
+      "labelAt": [
+        356,
+        378
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "The short answer",
+      "items": [
+        "Twice, through two doors that need no change to Claude Code",
+        "The first is read-only and free: the transcripts it already writes under ~/.claude/projects are the corpus",
+        "polyx-lens reads them in place and reports which of the rules the agent was given it actually kept — no store, no copy, no network, nothing of polyx installed"
+      ]
+    },
+    {
+      "dot": "slate",
+      "title": "Not shown here",
+      "items": [
+        "The report itself, which the lens CLI prints",
+        "the store, which logs every decision so the next mining pass is over what actually happened, including the times the model overrode the rule",
+        "the observation port, which the live path uses when a request carries text and a key is set"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Doctrine",
+      "items": [
+        "Claude Code meets polyx at two doors, and the free one needs nothing installed but the lens — the transcripts it already writes are the corpus, so the free report runs over them in place; the hook is the second door, and it is sixty lines that depend only on the free half to type the session and on loopback HTTP to ask",
+        "Nothing is served that a person has not adjudicated real — a mined regularity is a proposal; some are norms, some are habits, and some are artefacts of how work is scheduled, and only a human can tell which"
+      ]
+    }
+  ]
+}
