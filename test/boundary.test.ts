@@ -80,7 +80,7 @@ test('the mining path may not import the observation port at all (JT1.2)', () =>
     // Not the adapter — the PORT. Mining reads recorded answers from the
     // annotation store; a live call there would end byte-for-byte
     // reproducibility, because the model is not bit-stable.
-    writeFileSync(join(dir, 'src', 'mine', 'ask.ts'), "import { type Observer } from 'polyx-lens';\nexport type O = Observer;\n");
+    writeFileSync(join(dir, 'src', 'mine', 'ask.ts'), "import { type Observer } from '@cognitive-fab/polyx-lens';\nexport type O = Observer;\n");
     const r = spawnSync(process.execPath, [SCRIPT, '--root', dir], { encoding: 'utf8' });
     assert.equal(r.status, 1);
     assert.match(r.stderr, /must read annotations, never call the model/);

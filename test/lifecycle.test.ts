@@ -1,10 +1,10 @@
 // Adjudication persistence and the rule lifecycle (F5.2, F5.3, TS §7.6).
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { type Rule } from 'polyx-lens';
+import { type Rule } from '@cognitive-fab/polyx-lens';
 import { cmdMine, cmdReview, recordRun } from '../src/cli/main.ts';
 import { mine } from '../src/mine/index.ts';
-import { loadCorpus } from 'polyx-lens';
+import { loadCorpus } from '@cognitive-fab/polyx-lens';
 import { openStore } from '../src/store/db.ts';
 import { adjudicate, adjudications, loadRule, loadRules, pendingNarrowings, persistMined, reviewPace } from '../src/store/rules.ts';
 import { capture, tempWorkspace, type TempWorkspace } from './helpers.ts';

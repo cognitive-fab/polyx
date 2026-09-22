@@ -2,7 +2,7 @@
 // interactions, every alignment labelled proposed-for-confirmation.
 // Self-contained, no scripts, no external resources — a file a compliance
 // officer can open, print, or attach.
-import { type InstanceRef, type Manifest } from 'polyx-lens';
+import { type InstanceRef, type Manifest } from '@cognitive-fab/polyx-lens';
 import type { ClauseFinding, Diff, RuleFinding } from './index.ts';
 
 const esc = (s: unknown) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);

@@ -4,13 +4,13 @@
 //
 // No LLM call anywhere in here, by design (TS §11): same corpus + same
 // alphabet version + same thresholds → byte-identical rule set.
-import { type LoadedCorpus, type Thresholds } from 'polyx-lens';
-import { attachObservations, type AnnotationFile } from 'polyx-lens';
-import { consequentialTypes, recommendableTypes } from 'polyx-lens';
-import { evalCondition } from 'polyx-lens';
-import { simpleClassifier, type ProvenanceClassifier } from 'polyx-lens';
-import { naiveExtractor, type Instance, type Subject, type SubjectExtractor } from 'polyx-lens';
-import { ratio, type Rule, type RuleStatus } from 'polyx-lens';
+import { type LoadedCorpus, type Thresholds } from '@cognitive-fab/polyx-lens';
+import { attachObservations, type AnnotationFile } from '@cognitive-fab/polyx-lens';
+import { consequentialTypes, recommendableTypes } from '@cognitive-fab/polyx-lens';
+import { evalCondition } from '@cognitive-fab/polyx-lens';
+import { simpleClassifier, type ProvenanceClassifier } from '@cognitive-fab/polyx-lens';
+import { naiveExtractor, type Instance, type Subject, type SubjectExtractor } from '@cognitive-fab/polyx-lens';
+import { ratio, type Rule, type RuleStatus } from '@cognitive-fab/polyx-lens';
 import { ruleId } from '../store/identity.ts';
 import { contradictions as findContradictions, type Contradiction } from './contradictions.ts';
 import { instanceFacts } from './facts.ts';
@@ -20,7 +20,7 @@ import { VACUOUS_EPISODE } from './patterns.ts';
 import { subsumed } from './subsumption.ts';
 import { ref, sample } from './support.ts';
 import { decisionPoints, refs, synthesiseRecommendations } from './recommend.ts';
-import { cmp } from 'polyx-lens';
+import { cmp } from '@cognitive-fab/polyx-lens';
 
 export interface MineOptions {
   /** Mine recommendation rules too (default true). */

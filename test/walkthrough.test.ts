@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { fixturesDir } from 'polyx-lens';
+import { fixturesDir } from '@cognitive-fab/polyx-lens';
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
 import { main } from '../src/cli/main.ts';
 import { tempWorkspace } from './helpers.ts';

@@ -9,16 +9,16 @@
 // records — the analyst's traceability, not the reviewer's — are behind an
 // explicit click.
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
-import { type Condition, type Event, type Interaction, type LoadedCorpus, type Rule, type PredicateSet } from 'polyx-lens';
-import { renderCondition } from 'polyx-lens';
+import { type Condition, type Event, type Interaction, type LoadedCorpus, type Rule, type PredicateSet } from '@cognitive-fab/polyx-lens';
+import { renderCondition } from '@cognitive-fab/polyx-lens';
 import { verdict as verdictLabel } from '../mine/index.ts';
 import { resolveRaw } from '../show.ts';
 import { openStore, type Store } from '../store/db.ts';
 import { adjudicate, adjudications, loadRule, loadRules, reviewPace, type ReviewVerdict } from '../store/rules.ts';
-import { evalCondition } from 'polyx-lens';
-import { cmp } from 'polyx-lens';
-import { consequentialTypes } from 'polyx-lens';
-import { naiveExtractor } from 'polyx-lens';
+import { evalCondition } from '@cognitive-fab/polyx-lens';
+import { cmp } from '@cognitive-fab/polyx-lens';
+import { consequentialTypes } from '@cognitive-fab/polyx-lens';
+import { naiveExtractor } from '@cognitive-fab/polyx-lens';
 import { decisionPoints, type DecisionPoint } from '../mine/recommend.ts';
 
 export interface ReviewServerOptions {

@@ -2,12 +2,12 @@
 // search, the two figures, and the negative result when nothing clears.
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { type Rule } from 'polyx-lens';
-import { consequentialTypes } from 'polyx-lens';
+import { type Rule } from '@cognitive-fab/polyx-lens';
+import { consequentialTypes } from '@cognitive-fab/polyx-lens';
 import { mine } from '../src/mine/index.ts';
 import { decisionPoints, synthesiseRecommendations } from '../src/mine/recommend.ts';
-import { loadCorpus } from 'polyx-lens';
-import { naiveExtractor } from 'polyx-lens';
+import { loadCorpus } from '@cognitive-fab/polyx-lens';
+import { naiveExtractor } from '@cognitive-fab/polyx-lens';
 import { Advisor } from '../src/serve/advisor.ts';
 import { tempWorkspace } from './helpers.ts';
 

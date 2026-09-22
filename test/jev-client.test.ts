@@ -3,7 +3,7 @@
 // the backoff on 429/529, and that a whole battery rides one call.
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { type Predicate } from 'polyx-lens';
+import { type Predicate } from '@cognitive-fab/polyx-lens';
 import { JevClient, JevError, JEV_URL } from '../src/ports/jev/client.ts';
 import { jevObserver, observerFromEnv } from '../src/ports/jev/observer.ts';
 

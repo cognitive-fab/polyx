@@ -26,7 +26,7 @@ const policyRoots = process.env.POLYX_POLICIES
   : configured.map((d) => join(root, d));
 // `fixture:<path>` names a corpus or clause set shipped with polyx-lens, wherever
 // the package installed — the same rule polyx-lens/src/config.ts applies.
-const { fixturesDir } = await import('polyx-lens');
+const { fixturesDir } = await import('@cognitive-fab/polyx-lens');
 const resolveSource = (p) => (p.startsWith('fixture:') ? join(fixturesDir(), p.slice('fixture:'.length)) : join(root, p));
 const resolvePolicy = (p) => (p.startsWith('fixture:') ? resolveSource(p) : /[\\/]/.test(p) ? join(root, p) : (policyRoots.map((d) => join(d, p)).find((f) => existsSync(f)) ?? join(policyRoots[0], p)));
 

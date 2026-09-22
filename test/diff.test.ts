@@ -10,7 +10,7 @@ import { test } from 'node:test';
 import { cmdDiff, cmdMine } from '../src/cli/main.ts';
 import { diff } from '../src/diff/index.ts';
 import { mine } from '../src/mine/index.ts';
-import { loadCorpus } from 'polyx-lens';
+import { loadCorpus } from '@cognitive-fab/polyx-lens';
 import { FIXTURES, ROOT, capture, tempWorkspace } from './helpers.ts';
 
 const POLICY = join(FIXTURES, 'synthetic', 'synthetic-policy.yaml');

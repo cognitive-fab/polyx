@@ -9,7 +9,7 @@
 // which is exactly the shape the synthetic corpus plants.
 import { canonicalJson } from '../store/identity.ts';
 import type { Prunable } from './subsumption.ts';
-import { cmp } from 'polyx-lens';
+import { cmp } from '@cognitive-fab/polyx-lens';
 
 export interface Contradiction {
   /** The operator whose proposed set holds both rules. */

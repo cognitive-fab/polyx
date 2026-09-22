@@ -12,12 +12,12 @@
 // Every finding links to interactions (F8.2). Every alignment is labelled as
 // proposed-for-confirmation (F8.3): alignment is the least reliable step in
 // the system and the report says so wherever its output appears.
-import { type LoadedCorpus } from 'polyx-lens';
+import { type LoadedCorpus } from '@cognitive-fab/polyx-lens';
 import { align, type Alignment } from '../evaluate/align.ts';
 import { controls, type ClauseExercise } from '../evaluate/controls.ts';
 import { loadPolicy, type Clause, type Policy } from '../evaluate/policies/index.ts';
-import { fraction, type InstanceRef, type Rule } from 'polyx-lens';
-import { cmp } from 'polyx-lens';
+import { fraction, type InstanceRef, type Rule } from '@cognitive-fab/polyx-lens';
+import { cmp } from '@cognitive-fab/polyx-lens';
 
 /**
  * Why a mined rule has no clause (human ruling, 29 Aug 2026).

@@ -16,7 +16,7 @@
 //      ever repeats. Kept only when the implies rule is not proposed.
 //
 // Anything subtler — co-existence, absence — is left to the reviewer.
-import { type Condition, type Window } from 'polyx-lens';
+import { type Condition, type Window } from '@cognitive-fab/polyx-lens';
 import { canonicalJson } from '../store/identity.ts';
 export interface Prunable {
   id: string;

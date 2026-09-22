@@ -26,7 +26,7 @@ import {
   type Predicate,
   type PredicateSet,
   type TextProfile,
-} from 'polyx-lens';
+} from '@cognitive-fab/polyx-lens';
 import type { AdviseRequest } from './advisor.ts';
 
 export interface LiveObservation {

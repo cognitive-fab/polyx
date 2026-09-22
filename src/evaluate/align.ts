@@ -14,10 +14,10 @@
 //   general   same subject and guard; the rule is unconditioned (it claims more than the clause)
 //   proposed  same subject and guard; the rule is conditioned on something the clause does not name
 import { readFileSync, existsSync } from 'node:fs';
-import { type Rule } from 'polyx-lens';
+import { type Rule } from '@cognitive-fab/polyx-lens';
 import { parse } from 'yaml';
 import type { Clause, Policy } from './policies/index.ts';
-import { cmp } from 'polyx-lens';
+import { cmp } from '@cognitive-fab/polyx-lens';
 
 export type MatchKind = 'exact' | 'general' | 'proposed';
 

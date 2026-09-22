@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { spawn } from 'node:child_process';
 import { join } from 'node:path';
-import { fixturesDir, loadAlphabet, builtinAlphabet, recommendableTypes, type Rule } from 'polyx-lens';
+import { fixturesDir, loadAlphabet, builtinAlphabet, recommendableTypes, type Rule } from '@cognitive-fab/polyx-lens';
 import { startAdvisorServer } from '../src/serve/http.ts';
 import { openStore } from '../src/store/db.ts';
 import { persistMined } from '../src/store/rules.ts';

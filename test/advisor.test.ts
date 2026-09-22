@@ -2,10 +2,10 @@
 // HTTP surface, the decision-point log, the replay, and the 500-rule p95.
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { type Rule } from 'polyx-lens';
+import { type Rule } from '@cognitive-fab/polyx-lens';
 import { cmdCoverage, cmdMine } from '../src/cli/main.ts';
 import { mine } from '../src/mine/index.ts';
-import { loadCorpus } from 'polyx-lens';
+import { loadCorpus } from '@cognitive-fab/polyx-lens';
 import { Advisor, factsAt, parseRequest, type AdviseRequest } from '../src/serve/advisor.ts';
 import { replay } from '../src/serve/coverage.ts';
 import { startAdvisorServer } from '../src/serve/http.ts';

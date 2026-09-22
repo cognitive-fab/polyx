@@ -8,9 +8,9 @@ import { cmdEvaluate, cmdMine } from '../src/cli/main.ts';
 import { controls } from '../src/evaluate/controls.ts';
 import { loadPolicy } from '../src/evaluate/policies/index.ts';
 import { parseSweep, sweep } from '../src/evaluate/sweep.ts';
-import { tau2Adapter } from 'polyx-lens';
+import { tau2Adapter } from '@cognitive-fab/polyx-lens';
 import { mine } from '../src/mine/index.ts';
-import { loadCorpus } from 'polyx-lens';
+import { loadCorpus } from '@cognitive-fab/polyx-lens';
 import { capture, FIXTURES, ROOT, tempWorkspace } from './helpers.ts';
 
 const POLICY = join(FIXTURES, 'synthetic', 'synthetic-policy.yaml');

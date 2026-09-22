@@ -11,9 +11,9 @@
 // care which). The support quoted is the support at that scope; the
 // operator-wide figure rides along as `corpusSupport` so nobody mistakes a
 // habit for a norm.
-import { type Elsewhere, type Instance, type ProvenanceClassifier, type Support, type Thresholds, type Verdict } from 'polyx-lens';
+import { type Elsewhere, type Instance, type ProvenanceClassifier, type Support, type Thresholds, type Verdict } from '@cognitive-fab/polyx-lens';
 import { measure, type Measured } from './support.ts';
-import { cmp } from 'polyx-lens';
+import { cmp } from '@cognitive-fab/polyx-lens';
 
 export interface Provenanced {
   verdict: Verdict;

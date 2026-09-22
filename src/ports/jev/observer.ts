@@ -10,7 +10,7 @@
 // Nothing above this knows the vendor. A second System One implementation,
 // or a local classifier, drops in behind the same interface, and the manifest
 // records which one answered.
-import { emit, nullObserver, type Observation, type Observer, type Predicate } from 'polyx-lens';
+import { emit, nullObserver, type Observation, type Observer, type Predicate } from '@cognitive-fab/polyx-lens';
 import { JevClient, type JevClientOptions, type NoulQuestion } from './client.ts';
 
 export interface JevObserverOptions extends JevClientOptions {

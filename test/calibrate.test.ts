@@ -4,8 +4,8 @@
 // path runs offline.
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { builtinTextProfile, loadCorpus, loadTextProfile, type Observer, type Predicate } from 'polyx-lens';
-import { nullObserver } from 'polyx-lens';
+import { builtinTextProfile, loadCorpus, loadTextProfile, type Observer, type Predicate } from '@cognitive-fab/polyx-lens';
+import { nullObserver } from '@cognitive-fab/polyx-lens';
 import { join } from 'node:path';
 import { mkdirSync } from 'node:fs';
 import {

@@ -23,7 +23,7 @@ if (('polyness' in deps || adapters) && !/polyness[\s\S]*Apache/i.test(notice)) 
 // wants attribution whether or not the dependency is ours, and this one is the
 // dependency the licence split rests on: if it stops being attributed, the
 // split has probably stopped being real too.
-if ('polyx-lens' in deps && !/polyx-lens[\s\S]*Apache/i.test(notice)) {
+if ('@cognitive-fab/polyx-lens' in deps && !/polyx-lens[\s\S]*Apache/i.test(notice)) {
   failures.push('polyx-lens is a dependency but NOTICE does not attribute it under Apache-2.0');
 }
 if (!existsSync(join(ROOT, 'DATASETS.md'))) failures.push('DATASETS.md is missing');

@@ -12,9 +12,9 @@
 // A GUARD has to be a step — an action — never an utterance. "Every refund
 // was preceded by the customer saying something" is true and useless: nobody
 // can satisfy it deliberately and no gate could check it.
-import { type Instance, type Subject, type Thresholds, type Window } from 'polyx-lens';
-import { UNKNOWN_TYPE } from 'polyx-lens';
-import { cmp } from 'polyx-lens';
+import { type Instance, type Subject, type Thresholds, type Window } from '@cognitive-fab/polyx-lens';
+import { UNKNOWN_TYPE } from '@cognitive-fab/polyx-lens';
+import { cmp } from '@cognitive-fab/polyx-lens';
 
 export interface PatternArgs {
   subject: string;

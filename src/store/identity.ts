@@ -8,8 +8,8 @@
 // the bindings' vocabulary and therefore should change identity — which is
 // correct, because it is a different rule about a differently-defined event.
 import { createHash } from 'node:crypto';
-import { type Condition, type RuleFamily, type Window } from 'polyx-lens';
-import { cmp } from 'polyx-lens';
+import { type Condition, type RuleFamily, type Window } from '@cognitive-fab/polyx-lens';
+import { cmp } from '@cognitive-fab/polyx-lens';
 
 export interface IdentityInput {
   family: RuleFamily;

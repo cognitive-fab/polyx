@@ -43,7 +43,7 @@ import {
   type Predicate,
   type TextProfile,
   type Thresholds,
-} from 'polyx-lens';
+} from '@cognitive-fab/polyx-lens';
 import { resolveRaw } from '../../show.ts';
 
 /** One drawn site, before anybody has said anything about it. */

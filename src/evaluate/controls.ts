@@ -11,9 +11,9 @@
 // Both are computed from the corpus itself, on the evaluation side, so they
 // apply to any corpus — ABCD included, where "violated at least once" is
 // simply a property of the humans.
-import { type InstanceRef, type LoadedCorpus } from 'polyx-lens';
+import { type InstanceRef, type LoadedCorpus } from '@cognitive-fab/polyx-lens';
 import { GOOD_OUTCOMES } from '../mine/recommend.ts';
-import { exerciseClauses, type ClauseExercise } from 'polyx-lens';
+import { exerciseClauses, type ClauseExercise } from '@cognitive-fab/polyx-lens';
 import type { Policy } from './policies/index.ts';
 
 // The clause checker is the lens's engine, not the evaluator's: checking a
@@ -21,7 +21,7 @@ import type { Policy } from './policies/index.ts';
 // product is exactly that capability. Re-exported here so the evaluation side
 // keeps one import path.
 export { exerciseClauses, type ClauseExercise };
-import { THRESHOLDS, type Thresholds } from 'polyx-lens';
+import { THRESHOLDS, type Thresholds } from '@cognitive-fab/polyx-lens';
 import { ref, sample } from '../mine/support.ts';
 
 

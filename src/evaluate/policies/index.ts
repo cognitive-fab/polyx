@@ -1,7 +1,7 @@
 // Policy clause sets (TS §9.1) — the answer key, loaded on the evaluation
 // side only. The boundary check keeps this module unreachable from mine/.
 import { readFileSync } from 'node:fs';
-import { type Scalar } from 'polyx-lens';
+import { type Scalar } from '@cognitive-fab/polyx-lens';
 import { parse } from 'yaml';
 export interface Clause {
   id: string;

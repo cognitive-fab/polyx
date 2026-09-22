@@ -2,18 +2,18 @@
 import { copyFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { parseArgs } from 'node:util';
-import { type Condition, type Rule } from 'polyx-lens';
-import { audit, figureEvents, renderAudit } from 'polyx-lens';
-import { loadAlphabet, recommendableTypes } from 'polyx-lens';
-import { activePredicates, annotatableAdapters, builtinPredicates, inertPredicates, isStale, loadPredicateSet, unproducedFacts, type Predicate, type PredicateSet } from 'polyx-lens';
-import { annotationPath, builtinTextProfile, diffAnnotations, loadTextProfile, profileId, readAnnotations, type AnnotationFile } from 'polyx-lens';
-import { loadConfig, corpusConfig, type Config } from 'polyx-lens';
-import { codeCommit, corpusRevision, newRunId, type Manifest } from 'polyx-lens';
-import { loadCorpus, type LoadOptions, type LoadedCorpus } from 'polyx-lens';
-import { renderCondition } from 'polyx-lens';
-import { exerciseClauses, inventory } from 'polyx-lens';
-import { loadContracts } from 'polyx-lens';
-import { buildReport, renderReport } from 'polyx-lens';
+import { type Condition, type Rule } from '@cognitive-fab/polyx-lens';
+import { audit, figureEvents, renderAudit } from '@cognitive-fab/polyx-lens';
+import { loadAlphabet, recommendableTypes } from '@cognitive-fab/polyx-lens';
+import { activePredicates, annotatableAdapters, builtinPredicates, inertPredicates, isStale, loadPredicateSet, unproducedFacts, type Predicate, type PredicateSet } from '@cognitive-fab/polyx-lens';
+import { annotationPath, builtinTextProfile, diffAnnotations, loadTextProfile, profileId, readAnnotations, type AnnotationFile } from '@cognitive-fab/polyx-lens';
+import { loadConfig, corpusConfig, type Config } from '@cognitive-fab/polyx-lens';
+import { codeCommit, corpusRevision, newRunId, type Manifest } from '@cognitive-fab/polyx-lens';
+import { loadCorpus, type LoadOptions, type LoadedCorpus } from '@cognitive-fab/polyx-lens';
+import { renderCondition } from '@cognitive-fab/polyx-lens';
+import { exerciseClauses, inventory } from '@cognitive-fab/polyx-lens';
+import { loadContracts } from '@cognitive-fab/polyx-lens';
+import { buildReport, renderReport } from '@cognitive-fab/polyx-lens';
 import { renderDiffHtml } from '../diff/html.ts';
 import { diff, renderDiff } from '../diff/index.ts';
 import { evaluate, renderEvaluation } from '../evaluate/index.ts';
@@ -22,8 +22,8 @@ import { goldFileFor, progress, readSuperseded, readVerdicts, sampleGold, supers
 import { loadPolicy } from '../evaluate/policies/index.ts';
 import { parseSweep, renderSweep, sweep } from '../evaluate/sweep.ts';
 import { mine, renderMine, verdict } from '../mine/index.ts';
-import { simpleClassifier } from 'polyx-lens';
-import { builtinContracts, naiveExtractor, polynessClassifier, polynessExtractor } from 'polyx-lens';
+import { simpleClassifier } from '@cognitive-fab/polyx-lens';
+import { builtinContracts, naiveExtractor, polynessClassifier, polynessExtractor } from '@cognitive-fab/polyx-lens';
 import { startReviewServer } from '../review/server.ts';
 import { renderReplay, replay } from '../serve/coverage.ts';
 import { coverageSummary, startAdvisorServer, type ServeOptions } from '../serve/http.ts';
@@ -34,7 +34,7 @@ import { annotate, writePreview } from '../ports/jev/annotate.ts';
 import { observerFromEnv } from '../ports/jev/observer.ts';
 import { openStore, type Store } from '../store/db.ts';
 import { adjudicate, adjudications, loadRule, loadRules, pendingNarrowings, persistMined, reviewPace, type ReviewVerdict } from '../store/rules.ts';
-import { withThresholds, type Thresholds } from 'polyx-lens';
+import { withThresholds, type Thresholds } from '@cognitive-fab/polyx-lens';
 
 const USAGE = `usage: polyx <command> [options]
 

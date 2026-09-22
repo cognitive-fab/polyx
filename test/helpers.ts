@@ -3,7 +3,7 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { alphabetsDir, fixturesDir, withThresholds, type Config, type Thresholds } from 'polyx-lens';
+import { alphabetsDir, fixturesDir, withThresholds, type Config, type Thresholds } from '@cognitive-fab/polyx-lens';
 
 export const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)));
 /** The mining fixtures polyx authored — the corpus fixtures ship with the lens. */

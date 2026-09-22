@@ -7,7 +7,7 @@ import { join } from 'node:path';
 import { test } from 'node:test';
 import { cmdAudit } from '../src/cli/main.ts';
 import { openStore } from '../src/store/db.ts';
-import { loadCorpus } from 'polyx-lens';
+import { loadCorpus } from '@cognitive-fab/polyx-lens';
 import { capture, FIXTURES, tempWorkspace } from './helpers.ts';
 
 const seeded = (JSON.parse(readFileSync(join(FIXTURES, 'synthetic', 'seeded.json'), 'utf8')) as { identifiers: string[] }).identifiers;

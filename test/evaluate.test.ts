@@ -11,13 +11,13 @@ import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { test } from 'node:test';
 import { cmdEvaluate, cmdMine } from '../src/cli/main.ts';
-import { loadConfig } from 'polyx-lens';
+import { loadConfig } from '@cognitive-fab/polyx-lens';
 import { align, goldReport } from '../src/evaluate/align.ts';
 import { evaluate, gate } from '../src/evaluate/index.ts';
 import { metrics } from '../src/evaluate/metrics.ts';
 import { loadPolicy, parsePolicy } from '../src/evaluate/policies/index.ts';
 import { mine } from '../src/mine/index.ts';
-import { loadCorpus } from 'polyx-lens';
+import { loadCorpus } from '@cognitive-fab/polyx-lens';
 import { FIXTURES, ROOT, capture, tempWorkspace } from './helpers.ts';
 
 const POLICY = join(FIXTURES, 'synthetic', 'synthetic-policy.yaml');

@@ -6,8 +6,8 @@
 // counting it once per occurrence punishes a duplicate twice: ten episodes,
 // one of which refunded three times, would score 9/12 rather than 9/10 and
 // fall below the floor in exactly the case the rule exists to catch.
-import { type Instance, type Support } from 'polyx-lens';
-import { ref, sample } from 'polyx-lens';
+import { type Instance, type Support } from '@cognitive-fab/polyx-lens';
+import { ref, sample } from '@cognitive-fab/polyx-lens';
 export { ref, sample };
 
 export interface Measured extends Support {

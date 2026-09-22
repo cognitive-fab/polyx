@@ -3,9 +3,9 @@
 // second domain, so every floor is swept and a CURVE is reported, never a
 // tuned point. Mining is deterministic and in-memory, so a sweep is just the
 // cartesian product of the requested values, each run stamped.
-import { type LoadedCorpus } from 'polyx-lens';
+import { type LoadedCorpus } from '@cognitive-fab/polyx-lens';
 import { mine } from '../mine/index.ts';
-import { withThresholds, type Thresholds } from 'polyx-lens';
+import { withThresholds, type Thresholds } from '@cognitive-fab/polyx-lens';
 import { align } from './align.ts';
 import { metrics, type Metrics } from './metrics.ts';
 import { loadPolicy } from './policies/index.ts';

@@ -2,7 +2,7 @@
 // source file on the analyst's disk; this module follows it. Nothing else in
 // polyx reads source content after ingestion.
 import { readFileSync } from 'node:fs';
-import { type Event, type Interaction, type RawRef } from 'polyx-lens';
+import { type Event, type Interaction, type RawRef } from '@cognitive-fab/polyx-lens';
 const cache = new Map<string, unknown>();
 
 function loadFile(file: string): unknown {

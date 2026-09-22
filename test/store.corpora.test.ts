@@ -3,10 +3,10 @@
 // (id, corpus, scope), not (id, scope).
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { type Manifest, type Rule } from 'polyx-lens';
+import { type Manifest, type Rule } from '@cognitive-fab/polyx-lens';
 import { openStore } from '../src/store/db.ts';
 import { adjudicate, loadRule, loadRules, persistMined } from '../src/store/rules.ts';
-import { THRESHOLDS } from 'polyx-lens';
+import { THRESHOLDS } from '@cognitive-fab/polyx-lens';
 
 const rule = (corpus: string, holds: number): Rule => ({
   id: 'same-identity',

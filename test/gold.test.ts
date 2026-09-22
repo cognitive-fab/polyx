@@ -10,7 +10,7 @@ import { startGoldServer } from '../src/evaluate/gold-server.ts';
 import { goldFileFor, progress, readVerdicts, sampleGold, upsertVerdict, writeVerdicts } from '../src/evaluate/gold.ts';
 import { loadPolicy } from '../src/evaluate/policies/index.ts';
 import { mine } from '../src/mine/index.ts';
-import { loadCorpus } from 'polyx-lens';
+import { loadCorpus } from '@cognitive-fab/polyx-lens';
 import { FIXTURES, ROOT, capture, tempWorkspace } from './helpers.ts';
 
 const POLICY = join(FIXTURES, 'synthetic', 'synthetic-policy.yaml');

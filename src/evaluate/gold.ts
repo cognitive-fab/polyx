@@ -22,10 +22,10 @@
 // Verdicts land in policies/<policy>-gold.yaml, which is a committed
 // evaluation artefact like the clause set itself.
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { type Alphabet } from 'polyx-lens';
+import { type Alphabet } from '@cognitive-fab/polyx-lens';
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
-import { cmp } from 'polyx-lens';
-import { fraction, type Rule } from 'polyx-lens';
+import { cmp } from '@cognitive-fab/polyx-lens';
+import { fraction, type Rule } from '@cognitive-fab/polyx-lens';
 import { align, type MatchKind } from './align.ts';
 import type { Clause, Policy } from './policies/index.ts';
 export type Stratum = 'exact' | 'general' | 'proposed' | 'near-miss' | 'tribal';

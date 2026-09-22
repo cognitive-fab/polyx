@@ -23,7 +23,7 @@
 // which JF5.2's precedence must render harmless.
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { consequentialTypes, loadCorpus, naiveExtractor, type Observation, type Rule } from 'polyx-lens';
+import { consequentialTypes, loadCorpus, naiveExtractor, type Observation, type Rule } from '@cognitive-fab/polyx-lens';
 import { decisionPoints } from '../src/mine/recommend.ts';
 import { Advisor, factsAt, type AdviseRequest, type AdviseResponse } from '../src/serve/advisor.ts';
 import { tempWorkspace } from './helpers.ts';

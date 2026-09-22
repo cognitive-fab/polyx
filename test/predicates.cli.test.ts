@@ -4,7 +4,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { readFileSync, writeFileSync } from 'node:fs';
-import { alphabetsDir, builtinPredicates, loadCorpus } from 'polyx-lens';
+import { alphabetsDir, builtinPredicates, loadCorpus } from '@cognitive-fab/polyx-lens';
 import { join } from 'node:path';
 import { cmdPredicates, predicateFileFor, type Ctx } from '../src/cli/main.ts';
 import { SYNTHETIC_ALPHABET, SYNTHETIC_SOURCE, tempWorkspace } from './helpers.ts';

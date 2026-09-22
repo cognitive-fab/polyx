@@ -7,7 +7,7 @@
 // Showing it first would anchor the rater on the thing being scored, and the
 // whole point of the exercise is an independent judgement.
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
-import { type Alphabet, type Rule } from 'polyx-lens';
+import { type Alphabet, type Rule } from '@cognitive-fab/polyx-lens';
 import { loadPolicy, type Policy } from './policies/index.ts';
 import { goldFileFor, progress, readSuperseded, readVerdicts, sampleGold, upsertVerdict, writeVerdicts, type GoldCandidate, type GoldVerdict } from './gold.ts';
 export interface GoldServerOptions {

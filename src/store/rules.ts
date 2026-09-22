@@ -5,8 +5,8 @@
 // Support, evidence and counter-examples are overwritten every run; the
 // human's verdict is not — unless the evidence moved enough to justify
 // asking again, and then the reason is shown.
-import { type Manifest, type Thresholds } from 'polyx-lens';
-import { ratio, unproducedFacts, type Condition, type PredicateSet, type Rule, type RuleStatus, type Window } from 'polyx-lens';
+import { type Manifest, type Thresholds } from '@cognitive-fab/polyx-lens';
+import { ratio, unproducedFacts, type Condition, type PredicateSet, type Rule, type RuleStatus, type Window } from '@cognitive-fab/polyx-lens';
 import type { Contradiction } from '../mine/contradictions.ts';
 import type { Store } from './db.ts';
 

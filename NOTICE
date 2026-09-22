@@ -14,7 +14,7 @@ src/ports/jev/ — the observation-port adapter for TypeSafe's Jev
 
 This product includes software developed by third parties:
 
-polyx-lens — https://github.com/cognitive-fab/polyx-lens
+@cognitive-fab/polyx-lens — https://github.com/cognitive-fab/polyx-lens
   Licensed under the Apache License, Version 2.0.
   The front half of this system — the canonical record, the alphabet, the
   ingest adapters, the three ports and the lens — is a separate package under a

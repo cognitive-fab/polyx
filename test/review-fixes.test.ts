@@ -2,12 +2,12 @@
 import assert from 'node:assert/strict';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import { type Rule } from 'polyx-lens';
-import { evalCondition } from 'polyx-lens';
-import { bpicAdapter } from 'polyx-lens';
+import { type Rule } from '@cognitive-fab/polyx-lens';
+import { evalCondition } from '@cognitive-fab/polyx-lens';
+import { bpicAdapter } from '@cognitive-fab/polyx-lens';
 import { cmdMine, cmdReview, recordRun } from '../src/cli/main.ts';
 import { synthesiseRecommendations } from '../src/mine/recommend.ts';
-import { loadCorpus } from 'polyx-lens';
+import { loadCorpus } from '@cognitive-fab/polyx-lens';
 import { Advisor } from '../src/serve/advisor.ts';
 import { openStore } from '../src/store/db.ts';
 import { adjudicate, adjudications, loadRules } from '../src/store/rules.ts';

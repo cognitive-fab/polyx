@@ -2,7 +2,7 @@
 // rule set the miner persisted and the policy clause set, aligns them,
 // computes the headline figures, and stamps every one with what produced it.
 import { existsSync } from 'node:fs';
-import { type LoadedCorpus, type Manifest, type Rule, type Thresholds } from 'polyx-lens';
+import { type LoadedCorpus, type Manifest, type Rule, type Thresholds } from '@cognitive-fab/polyx-lens';
 import { align, goldReport, loadGold, type Alignment, type GoldReport } from './align.ts';
 import { controls as computeControls, type Controls } from './controls.ts';
 import { fmt, metrics, type Metrics, type Ratio } from './metrics.ts';

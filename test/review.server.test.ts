@@ -3,7 +3,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { cmdMine } from '../src/cli/main.ts';
-import { loadCorpus } from 'polyx-lens';
+import { loadCorpus } from '@cognitive-fab/polyx-lens';
 import { startReviewServer } from '../src/review/server.ts';
 import { openStore } from '../src/store/db.ts';
 import { loadRule, reviewPace } from '../src/store/rules.ts';

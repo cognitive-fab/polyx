@@ -29,7 +29,7 @@
 //   POLYX_HOOK_STRICT   1 to block when the advisor cannot be reached
 import { readFileSync } from 'node:fs';
 import { basename, dirname } from 'node:path';
-import { applyAlphabet, builtinAlphabet, ccTextSource, loadAlphabet, projectOf, segmenterFor, toRaw } from 'polyx-lens';
+import { applyAlphabet, builtinAlphabet, ccTextSource, loadAlphabet, projectOf, segmenterFor, toRaw } from '@cognitive-fab/polyx-lens';
 
 const ADVISOR = (process.env.POLYX_ADVISOR_URL ?? 'http://127.0.0.1:7777').replace(/\/$/, '');
 const STRICT = process.env.POLYX_HOOK_STRICT === '1';

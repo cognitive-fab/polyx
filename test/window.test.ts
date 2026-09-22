@@ -7,11 +7,11 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import { type Config, type Rule } from 'polyx-lens';
+import { type Config, type Rule } from '@cognitive-fab/polyx-lens';
 import { mine, type MineResult } from '../src/mine/index.ts';
 import { VACUOUS_CONTACT } from '../src/mine/patterns.ts';
-import { loadCorpus, registerSegmenter } from 'polyx-lens';
-import { withThresholds } from 'polyx-lens';
+import { loadCorpus, registerSegmenter } from '@cognitive-fab/polyx-lens';
+import { withThresholds } from '@cognitive-fab/polyx-lens';
 import { FIXTURES, LOCAL_FIXTURES, ROOT, SYNTHETIC_ALPHABET } from './helpers.ts';
 
 // One episode per customer turn, so `before` and `sessionBefore` differ — the

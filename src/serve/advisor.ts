@@ -17,9 +17,9 @@
 // Serves only rules a person adjudicated `real` (F6.4). Every response is a
 // decision point, logged; that log is the coverage figure (§9.3) and, later,
 // the corpus for the next mining pass.
-import { type Event, type Observation, type Scalar } from 'polyx-lens';
-import { evalAll, type FactBase } from 'polyx-lens';
-import { fraction, type Rule } from 'polyx-lens';
+import { type Event, type Observation, type Scalar } from '@cognitive-fab/polyx-lens';
+import { evalAll, type FactBase } from '@cognitive-fab/polyx-lens';
+import { fraction, type Rule } from '@cognitive-fab/polyx-lens';
 
 export interface AdviseRequest {
   operator: string;

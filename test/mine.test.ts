@@ -1,11 +1,11 @@
 // The miner against the planted structure of the synthetic corpus.
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { type Rule } from 'polyx-lens';
+import { type Rule } from '@cognitive-fab/polyx-lens';
 import { mine, type MineResult } from '../src/mine/index.ts';
-import { loadCorpus } from 'polyx-lens';
-import { polynessClassifier } from 'polyx-lens';
-import { polynessExtractor } from 'polyx-lens';
+import { loadCorpus } from '@cognitive-fab/polyx-lens';
+import { polynessClassifier } from '@cognitive-fab/polyx-lens';
+import { polynessExtractor } from '@cognitive-fab/polyx-lens';
 import { ruleId } from '../src/store/identity.ts';
 import { tempWorkspace } from './helpers.ts';
 

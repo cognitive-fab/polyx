@@ -10,7 +10,7 @@ import { openStore, type Store } from '../store/db.ts';
 import { loadRule, loadRules } from '../store/rules.ts';
 import { Advisor, parseRequest, toRecord, type DecisionRecord } from './advisor.ts';
 import { LiveObserver, type LiveObservation } from './observe.ts';
-import { cmp } from 'polyx-lens';
+import { cmp } from '@cognitive-fab/polyx-lens';
 
 export interface ServeOptions {
   dbPath: string;

@@ -37,7 +37,7 @@ import {
   type Predicate,
   type PredicateSet,
   type TextProfile,
-} from 'polyx-lens';
+} from '@cognitive-fab/polyx-lens';
 import { resolveRaw } from '../../show.ts';
 
 const sha16 = (s: string): string => createHash('sha256').update(s).digest('hex').slice(0, 16);

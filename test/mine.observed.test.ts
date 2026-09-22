@@ -9,11 +9,11 @@
 // spec — the entire mining gain — unreachable, silently.
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { attachObservations, instanceFacts, loadCorpus, naiveExtractor, consequentialTypes, withThresholds, type AnnotationFile, type FactBase, type Observer } from 'polyx-lens';
+import { attachObservations, instanceFacts, loadCorpus, naiveExtractor, consequentialTypes, withThresholds, type AnnotationFile, type FactBase, type Observer } from '@cognitive-fab/polyx-lens';
 import { candidateConditions } from '../src/mine/facts.ts';
 import { mine } from '../src/mine/index.ts';
 import { annotate } from '../src/ports/jev/annotate.ts';
-import { loadTextProfile, builtinTextProfile, parsePredicateSet } from 'polyx-lens';
+import { loadTextProfile, builtinTextProfile, parsePredicateSet } from '@cognitive-fab/polyx-lens';
 import { tempWorkspace } from './helpers.ts';
 
 const t = withThresholds({ minInstances: 5 });

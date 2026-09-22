@@ -7,12 +7,12 @@
 // UNKNOWN is neither in the numerator nor the denominator of a conditioned
 // rule. Counting it as "condition false" would be the closed-world
 // assumption the advisor forbids, arriving by the back door.
-import { type Condition, type Instance, type Subject, type Thresholds, type Window } from 'polyx-lens';
-import { evalCondition, renderCondition } from 'polyx-lens';
+import { type Condition, type Instance, type Subject, type Thresholds, type Window } from '@cognitive-fab/polyx-lens';
+import { evalCondition, renderCondition } from '@cognitive-fab/polyx-lens';
 import { candidateConditions, instanceFacts, MAX_CONDITION_VALUES } from './facts.ts';
 import { PATTERNS, type Pattern, type PatternArgs } from './patterns.ts';
 import { measure, type Measured } from './support.ts';
-import { cmp } from 'polyx-lens';
+import { cmp } from '@cognitive-fab/polyx-lens';
 
 export interface Candidate {
   pattern: Pattern;

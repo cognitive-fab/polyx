@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { copyFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { annotationPath, loadCorpus, readAnnotations, unproducedFacts } from 'polyx-lens';
+import { annotationPath, loadCorpus, readAnnotations, unproducedFacts } from '@cognitive-fab/polyx-lens';
 import { annotationsFor, predicateSetFor, recordRun, type Ctx } from '../src/cli/main.ts';
 import { mine } from '../src/mine/index.ts';
 import { replay } from '../src/serve/coverage.ts';

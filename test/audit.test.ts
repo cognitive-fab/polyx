@@ -2,9 +2,9 @@ import assert from 'node:assert/strict';
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import { audit, figureEvents, renderAudit } from 'polyx-lens';
+import { audit, figureEvents, renderAudit } from '@cognitive-fab/polyx-lens';
 import { cmdAudit } from '../src/cli/main.ts';
-import { loadCorpus } from 'polyx-lens';
+import { loadCorpus } from '@cognitive-fab/polyx-lens';
 import { openStore } from '../src/store/db.ts';
 import { capture, tempWorkspace } from './helpers.ts';
 

@@ -21,11 +21,11 @@
 // antecedent is kept only when it beats every shorter one it contains.
 // Beyond that the search explodes and the rules stop being readable, which
 // defeats the purpose.
-import { type Condition, type Instance, type InstanceRef, type Subject, type Support, type Thresholds } from 'polyx-lens';
-import { evalCondition, renderCondition, type FactBase } from 'polyx-lens';
+import { type Condition, type Instance, type InstanceRef, type Subject, type Support, type Thresholds } from '@cognitive-fab/polyx-lens';
+import { evalCondition, renderCondition, type FactBase } from '@cognitive-fab/polyx-lens';
 import { candidateConditions, instanceFacts } from './facts.ts';
 import { sample, ref } from './support.ts';
-import { cmp } from 'polyx-lens';
+import { cmp } from '@cognitive-fab/polyx-lens';
 
 export interface DecisionPoint {
   episodeId: string;

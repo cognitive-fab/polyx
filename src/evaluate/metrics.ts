@@ -11,7 +11,7 @@
 // Every figure carries the count of inexpressible clauses beside it, because
 // "recovered 60% of the policy" and "recovered 60% of the third of the policy
 // it can even represent" are different claims and only the second is honest.
-import { type Rule } from 'polyx-lens';
+import { type Rule } from '@cognitive-fab/polyx-lens';
 import type { Alignment } from './align.ts';
 import type { Policy } from './policies/index.ts';
 

@@ -14,14 +14,14 @@
 // The replay writes its decision points to the same log the live endpoint
 // uses, tagged with its source, so `polyx serve`'s /coverage and this
 // command are the same figure over different traffic.
-import { attachObservations, type AnnotationFile, type LoadedCorpus, type Observation, type Rule } from 'polyx-lens';
-import { consequentialTypes, recommendableTypes } from 'polyx-lens';
+import { attachObservations, type AnnotationFile, type LoadedCorpus, type Observation, type Rule } from '@cognitive-fab/polyx-lens';
+import { consequentialTypes, recommendableTypes } from '@cognitive-fab/polyx-lens';
 import { decisionPoints, GOOD_OUTCOMES } from '../mine/recommend.ts';
-import { naiveExtractor } from 'polyx-lens';
+import { naiveExtractor } from '@cognitive-fab/polyx-lens';
 import type { Store } from '../store/db.ts';
 import { Advisor, toRecord, type AdviseRequest } from './advisor.ts';
 import { logDecision } from './http.ts';
-import { cmp } from 'polyx-lens';
+import { cmp } from '@cognitive-fab/polyx-lens';
 
 export interface Replay {
   decisionPoints: number;

@@ -2,8 +2,8 @@
 // derived artefacts. Phase 0 pins the audit; Phase 2 extends this to the rule set.
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { audit } from 'polyx-lens';
-import { loadCorpus } from 'polyx-lens';
+import { audit } from '@cognitive-fab/polyx-lens';
+import { loadCorpus } from '@cognitive-fab/polyx-lens';
 import { tempWorkspace } from './helpers.ts';
 
 test('audit twice, diff: identical', async () => {

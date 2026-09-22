@@ -5,7 +5,7 @@
 // existed and says so by name.
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { builtinTextProfile, loadTextProfile, parsePredicateSet, type Observer, type Rule } from 'polyx-lens';
+import { builtinTextProfile, loadTextProfile, parsePredicateSet, type Observer, type Rule } from '@cognitive-fab/polyx-lens';
 import { parseRequest, type AdviseRequest } from '../src/serve/advisor.ts';
 import { startAdvisorServer, type ServeOptions } from '../src/serve/http.ts';
 import { LiveObserver } from '../src/serve/observe.ts';

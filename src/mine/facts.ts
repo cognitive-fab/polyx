@@ -10,9 +10,9 @@
 //
 // Redaction surrogates (`h#…`, `<slot>#…`) are never condition values: a
 // rule conditioned on a hash is a rule nobody can read or satisfy.
-import { type Condition, type FactBase, type Scalar, type Thresholds } from 'polyx-lens';
-import { instanceFacts } from 'polyx-lens';
-import { cmp } from 'polyx-lens';
+import { type Condition, type FactBase, type Scalar, type Thresholds } from '@cognitive-fab/polyx-lens';
+import { instanceFacts } from '@cognitive-fab/polyx-lens';
+import { cmp } from '@cognitive-fab/polyx-lens';
 
 export { instanceFacts };
 

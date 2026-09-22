@@ -19,7 +19,7 @@ import {
   readAnnotations,
   type Observer,
   type PredicateSet,
-} from 'polyx-lens';
+} from '@cognitive-fab/polyx-lens';
 import { annotate, resolveSites, writePreview } from '../src/ports/jev/annotate.ts';
 import { FIXTURES, tempWorkspace } from './helpers.ts';
 
