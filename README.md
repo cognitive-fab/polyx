@@ -12,10 +12,6 @@ Source-available under the Business Source License 1.1, converting to Apache-2.0
 
 Node ≥ 22.18 (TypeScript is run directly under Node's type stripping, unflagged from 22.18 / 23.6; `npm run build` emits `dist/`).
 
-polyx depends on `polyx-lens` as a sibling checkout until it is on npm: clone
-[`polyx-lens`](https://github.com/cognitive-fab/polyx-lens) beside this
-repository first, and `npm install` there.
-
 ```
 npm install
 npm run ci                       # typecheck, boundary check, notice check, tests
@@ -28,6 +24,11 @@ node bin/polyx.mjs evaluate abcd                   # precision / recall / refusa
 node bin/polyx.mjs evaluate abcd --sweep "minInstances=5,10,30"
 node bin/polyx.mjs mine abcd --scope-by flow       # cross-flow provenance
 ```
+
+`polyx-lens` installs from npm. To work on both at once, clone
+[`polyx-lens`](https://github.com/cognitive-fab/polyx-lens) beside this
+repository and `npm link ../polyx-lens`; after any change there, `npm run
+build` there before polyx sees it.
 
 Observing a fact the typed record cannot see — a System One model as an
 observation port, wired in so that it can add a fact and can never assert an

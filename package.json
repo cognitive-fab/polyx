@@ -21,7 +21,7 @@
   },
   "license": "BUSL-1.1",
   "dependencies": {
-    "polyx-lens": "file:../polyx-lens",
+    "polyx-lens": "^0.1.0",
     "yaml": "^2.6.0"
   },
   "devDependencies": {

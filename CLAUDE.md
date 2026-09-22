@@ -9,15 +9,17 @@ Requirement ids in comments (`F6.4`, `A8.1`, `JF7`, `JT4.2`) point into those.
 
 ## Two packages, one built
 
-`polyx` depends on `../polyx-lens` (a sibling checkout, `file:` dependency)
-**through its `dist/`**. After any change under `polyx-lens/src/`:
+`polyx` depends on `polyx-lens` from npm. To develop both at once, clone it
+beside this repository and `npm link ../polyx-lens`; polyx then reads it
+**through its `dist/`**, so after any change under `polyx-lens/src/`:
 
 ```
 cd ../polyx-lens && npm run build
 ```
 
 or polyx will typecheck against stale declarations and you will chase a
-phantom error. Run `npm run ci` in **both** repositories before you consider
+phantom error. A change to the lens that polyx needs is a lens release: bump
+its version, publish, and bump the range here. Run `npm run ci` in **both** repositories before you consider
 anything done; the polyx suite exercises lens code the lens suite does not.
 
 ## The standing rules, and the check that enforces each

@@ -31,9 +31,10 @@ Certificate of Origin, `git commit -s`); that is the whole of the paperwork.
 
 ## How to work here
 
-- Two packages, one built. polyx reads `polyx-lens` through its `dist/`, so
-  after any change there, `npm run build` there before polyx sees it. Run
-  `npm run ci` in both before you consider anything done.
+- Two packages, one built. polyx installs `polyx-lens` from npm; to change
+  both, `npm link ../polyx-lens` and `npm run build` there after every change,
+  or polyx sees stale declarations. Run `npm run ci` in both before you
+  consider anything done.
 - Comments explain *why*, cite the requirement id (`F6.4`, `JT4.2`), and
   record what was measured. Match the density of the file you are in.
 - One change, one commit, a message that says why. The messages in this
