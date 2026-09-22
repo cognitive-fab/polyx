@@ -752,7 +752,7 @@ export async function cmdReview(ctx: Ctx, corpusName: string, args: string[], op
         for (const r of marked) ctx.out(`  ${r.scope.padEnd(24)} ${r.support.holds}/${r.support.of}  ${r.provenance.kind === 'own' ? 'own' : r.provenance.kind}`);
         if (skipped.length) {
           ctx.out(`left as they are (${skipped.length}):`);
-          for (const s of skipped) ctx.out(`  ${s.scope.padEnd(24)} ${s.status}`);
+          for (const s of skipped) ctx.out(`  ${s.scope.padEnd(24)} ${s.support.holds}/${s.support.of}  ${s.borrowed ? 'borrowed — this project does not keep it; review it on its own' : s.status}`);
         }
         return 0;
       }

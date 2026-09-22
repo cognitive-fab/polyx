@@ -182,12 +182,19 @@ test('the review CLI: list, show with both kinds of evidence, mark, pace', async
 test('real everywhere: one verdict, recorded row by row at each row\'s own support, and nothing else touched', async () => {
   const ws = tempWorkspace({ borrowedOperators: 1 });
   try {
-    const { rules } = await mineInto(ws);
+    // One planted row that only BORROWS R1: proposed at an operator whose own
+    // history breaks it — the shape that first shipped real at 0/21.
+    const { rules } = await mineInto(ws, (rs) => [...rs, { ...R1(rs), scope: 'op-zeta', provenance: { kind: 'borrowed', foundIn: ['op-alpha'] }, support: { holds: 1, of: 20 }, corpusSupport: { holds: 1, of: 20 } }]);
     // A rule proposed for more than one operator, so "everywhere" means something.
     const byId = new Map<string, Rule[]>();
     for (const r of rules) byId.set(r.id, [...(byId.get(r.id) ?? []), r]);
-    const [id, rows] = [...byId].find(([, rs]) => rs.filter((r) => r.status === 'proposed').length >= 2)!;
-    const proposed = rows.filter((r) => r.status === 'proposed').map((r) => r.scope).sort();
+    // …and, where the corpus has one, a row that only BORROWS it: proposed
+    // because other operators keep the rule, while this one does not.
+    const own = (rs: Rule[]) => rs.filter((r) => r.status === 'proposed' && r.provenance.kind === 'own');
+    const candidates = [...byId].filter(([, rs]) => own(rs).length >= 2);
+    const [id, rows] = candidates.find(([, rs]) => rs.some((r) => r.status === 'proposed' && r.provenance.kind === 'borrowed'))!;
+    const proposed = own(rows).map((r) => r.scope).sort();
+    const borrowed = rows.filter((r) => r.status === 'proposed' && r.provenance.kind === 'borrowed').map((r) => r.scope);
     const store = openStore(ws.config.dbPath);
     try {
       // A person already ruled on one row: that ruling stands.
@@ -196,7 +203,9 @@ test('real everywhere: one verdict, recorded row by row at each row\'s own suppo
       const { marked, skipped } = adjudicateEverywhere(store, id, 'real', { corpus: 'synthetic', reviewer: 'lead', at: 2 });
       assert.deepEqual(marked.map((r) => r.scope).sort(), proposed.slice(1));
       assert.ok(marked.every((r) => r.status === 'real'));
-      assert.deepEqual(skipped.find((s) => s.scope === ruled), { scope: ruled, status: 'not_real' });
+      assert.deepEqual({ ...skipped.find((s) => s.scope === ruled)!, support: undefined }, { scope: ruled, status: 'not_real', support: undefined });
+      // A borrowed row is never marked: "everywhere" is every project whose own history keeps the rule.
+      for (const scope of borrowed) assert.equal(skipped.find((s) => s.scope === scope)?.borrowed, true, scope);
       assert.equal(marked.length + skipped.length, rows.length, 'every row is either marked or named');
       // The trail is what separate marks would have left: one per row, at that row's support.
       for (const r of marked) {

@@ -208,7 +208,7 @@ export async function startReviewServer(opts: ReviewServerOptions): Promise<{ po
         }
         // The other projects this same rule stands proposed for: what "real
         // everywhere" would mark, shown before the reviewer presses it.
-        const elsewhere = loadRules(store, { corpus: corpusName, status: ['proposed'] })
+        const elsewhere = loadRules(store, { corpus: corpusName, status: ['proposed'], ownOnly: true })
           .filter((r) => r.id === rule.id && r.scope !== rule.scope)
           .map((r) => ({ scope: r.scope, support: r.support }));
         json(res, 200, { ...ruleView(store, opts.corpus, byId, rule, rule.family === 'recommendation' ? await decisions() : undefined), elsewhere });
@@ -335,7 +335,7 @@ const PAGE = /* html */ `<!doctype html>
 <footer id="footer" hidden>
   <button class="real" onclick="mark('real')" title="yes, this operation follows this rule — the advisor may serve it">Real<kbd>R</kbd></button>
   <button class="not" onclick="mark('not_real')" title="a coincidence, not a policy — not re-proposed unless its support moves">Not real<kbd>N</kbd></button>
-  <button class="real" id="everywhere" onclick="mark('real', undefined, true)" hidden title="real for this project and every other project this rule is proposed for, each at its own support">Real everywhere<kbd>E</kbd></button>
+  <button class="real" id="everywhere" onclick="mark('real', undefined, true)" hidden title="real for this project and every other project whose own history keeps this rule, each at its own support; projects that only borrow it are left for their own screen">Real everywhere<kbd>E</kbd></button>
   <button onclick="narrow()" title="true, but too broad — you name a condition and the next mine emits a narrower rule">Needs narrowing<kbd>W</kbd></button>
   <input type="text" id="note" placeholder="note (optional)">
   <input type="text" id="reviewer" placeholder="your name" style="max-width:160px">

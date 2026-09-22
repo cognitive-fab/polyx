@@ -86,8 +86,10 @@ all of them), with the path made absolute:
 Rules are mined per project, so the same rule is one row per project it was
 found in. To mean it for all of them, press **Real everywhere** (`E`) on the
 review page, or `node bin/polyx.mjs review cc mark <rule-id> real --everywhere`:
-each row it is proposed for is marked at its own support, and the rows left
-alone — refused, already ruled on, standing behind another rule — are listed.
+each project whose own history keeps the rule is marked at its own support,
+and the rows left alone are listed: a project that only *borrows* the rule —
+proposed there because other projects keep it — is one where marking it real
+would warn on most of what the agent does, and it gets its own screen.
 A project the rule was never mined for gets nothing; there is no evidence
 there to record the verdict against.
 
