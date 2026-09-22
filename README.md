@@ -24,6 +24,28 @@ can be used on its own: `npx @cognitive-fab/polyx-lens` reads your Claude Code
 transcripts in place and reports which of the rules the agent was given it
 kept, with nothing else installed.
 
+### Before you mine your own Claude Code sessions: keep them
+
+Claude Code deletes transcripts older than `cleanupPeriodDays` — **30 days
+unless you set it** — and those transcripts are the corpus. Raise it in
+`~/.claude/settings.json` before anything else:
+
+```json
+{ "cleanupPeriodDays": 365 }
+```
+
+Then freeze a copy, from a checkout, and re-run it whenever you want the
+corpus to catch up (at least once per retention period):
+
+```
+node corpora/link-cc.mjs --dry-run      # what it would add; writes nothing
+node corpora/link-cc.mjs                # adds new sessions, grows ones that grew, deletes nothing
+```
+
+A re-run only ever adds. A session Claude Code has since deleted stays in the
+copy, which is by then its only copy, and the script says how many of those
+it is keeping. It warns when the retention setting is 30 days or less.
+
 ## Run from a checkout
 
 TypeScript runs directly under Node's type stripping (unflagged from 22.18 /
@@ -67,7 +89,7 @@ words with its support, when a real rule says something should have happened
 first. Sixty lines, no change to the agent; the same three lines map onto any
 framework with a pre-tool seam, and the README there shows four.
 
-Corpora: `node corpora/fetch-abcd.mjs`; `git clone https://github.com/sierra-research/tau2-bench corpora/tau2-src && node corpora/link-tau2.mjs`; `git clone https://huggingface.co/datasets/choucsan/mimo-claude-code-traces-1k corpora/mimo-src` (`cc-mimo`); `node corpora/link-cc.mjs` freezes your own Claude Code transcripts as the private `cc` corpus.
+Corpora: `node corpora/fetch-abcd.mjs`; `git clone https://github.com/sierra-research/tau2-bench corpora/tau2-src && node corpora/link-tau2.mjs`; `git clone https://huggingface.co/datasets/choucsan/mimo-claude-code-traces-1k corpora/mimo-src` (`cc-mimo`); `node corpora/link-cc.mjs` freezes your own Claude Code transcripts as the private `cc` corpus — additively; set `cleanupPeriodDays` first (see *Before you mine your own Claude Code sessions*).
 
 Corpora are configured in `polyx.config.json`; alphabets live in `alphabets/`; derived artefacts go to `.polyx/` (gitignored). Every run writes a manifest — corpus revision, alphabet version, thresholds, seed, commit — and every printed figure expands to its source records with `--show`.
 

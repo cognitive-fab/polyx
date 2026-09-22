@@ -65,10 +65,12 @@ once. `POLYX_HOOK_STRICT=1` fails closed.
 
 ## Run it
 
-Against your own transcripts:
+Against your own transcripts. First make Claude Code keep them — it deletes
+transcripts older than `cleanupPeriodDays`, 30 days by default — with
+`"cleanupPeriodDays": 365` in `~/.claude/settings.json`. Then:
 
 ```
-node corpora/link-cc.mjs                       # freeze your Claude Code sessions as the private `cc` corpus
+node corpora/link-cc.mjs                       # freeze your Claude Code sessions as the private `cc` corpus; re-run to add, it never deletes
 node bin/polyx.mjs mine cc                     # candidate rules with evidence and counter-evidence
 node bin/polyx.mjs review cc serve             # mark the ones you mean `real`; nothing else is served
 node bin/polyx.mjs serve cc --port 7777        # the advisor, where the hook looks by default
