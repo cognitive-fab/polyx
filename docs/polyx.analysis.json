@@ -5,13 +5,13 @@
   "purpose": "Mine the rules an agent's own history supports, put them in front of a person, and serve the ones they accept at the moment a consequential action is about to happen — abstaining rather than guessing when a fact is missing. A System One model may observe what was said, and may add a fact; it may never assert an absence.",
   "repository": {
    "url": "https://github.com/cognitive-fab/polyx",
-   "revision": "9fb805bbd68483f4417a1c7fec4c24328f64bf8f"
+   "revision": "c80a06871222274d79cdca0a645ee28567044f40"
   },
   "sources": [
    {
     "kind": "code",
     "ref": "src/mine/, src/store/, src/serve/, src/review/, src/evaluate/, src/diff/, scripts/check-*.mjs",
-    "note": "read at 9fb805b"
+    "note": "read at c80a068"
    },
    {
     "kind": "code",
@@ -31,7 +31,7 @@
    {
     "kind": "code",
     "ref": "src/ports/jev/, src/serve/observe.ts, src/serve/advisor.ts, scripts/check-boundary.mjs, scripts/check-notice.mjs, examples/",
-    "note": "the observation port's paid-side adapter and the checks that confine it; read at 9fb805b"
+    "note": "the observation port's paid-side adapter and the checks that confine it; read at c80a068"
    },
    {
     "kind": "document",

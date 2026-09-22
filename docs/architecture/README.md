@@ -2,7 +2,7 @@
 
 Mine the rules an agent's own history supports, put them in front of a person, and serve the ones they accept at the moment a consequential action is about to happen — abstaining rather than guessing when a fact is missing. A System One model may observe what was said, and may add a fact; it may never assert an absence.
 
-Analysed at [`9fb805b`](https://github.com/cognitive-fab/polyx/tree/9fb805bbd68483f4417a1c7fec4c24328f64bf8f).
+Analysed at [`c80a068`](https://github.com/cognitive-fab/polyx/tree/c80a06871222274d79cdca0a645ee28567044f40).
 
 **Read from.** src/mine/, src/store/, src/serve/, src/review/, src/evaluate/, src/diff/, scripts/check-*.mjs (code); polyx-bench: policies/, polyx-eval: policies/cc-policy.yaml (code); LICENSING.md, docs/polyx-technical-spec.md (document); polyx-lens: src/ports/observation.ts, src/ports/text.ts, src/ports/predicates.ts, src/ports/calibrate.ts, src/ports/annotations.ts, src/alphabet/text.ts, src/record.ts, src/alphabet/, src/ingest/, src/ports/, src/pipeline.ts, src/lens/ (code); src/ports/jev/, src/serve/observe.ts, src/serve/advisor.ts, scripts/check-boundary.mjs, scripts/check-notice.mjs, examples/ (code); docs/polyx-jev-integration-spec.md, docs/polyx-jev-implementation-plan.md (document).
 
