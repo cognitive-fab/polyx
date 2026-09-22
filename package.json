@@ -48,7 +48,7 @@
   },
   "license": "BUSL-1.1",
   "dependencies": {
-    "@cognitive-fab/polyx-lens": "^0.2.0",
+    "@cognitive-fab/polyx-lens": "^0.2.1",
     "yaml": "^2.6.0"
   },
   "devDependencies": {
