@@ -20,6 +20,7 @@ import { cmp } from '@cognitive-fab/polyx-lens';
 import { consequentialTypes } from '@cognitive-fab/polyx-lens';
 import { naiveExtractor } from '@cognitive-fab/polyx-lens';
 import { decisionPoints, type DecisionPoint } from '../mine/recommend.ts';
+import { guardTypes } from '../mine/patterns.ts';
 
 export interface ReviewServerOptions {
   dbPath: string;
@@ -44,7 +45,14 @@ interface Timeline {
 function timeline(byId: Map<string, Interaction>, rule: Rule, ref: Rule['examples'][number]): Timeline | null {
   const it = byId.get(ref.interactionId);
   if (!it) return null;
-  const guard = rule.bindings.guard;
+  // A same-slot rule's guard is a set, and only the events about the same
+  // thing as the subject are its guard — the other reads are not "the read
+  // that must come first", and marking them so would show the reviewer the
+  // type-level rule instead of the one they are judging.
+  const guards = new Set(guardTypes(rule.bindings));
+  const slot = rule.bindings.slot;
+  const subjectValue = slot ? it.events.find((e: Event) => e.seq === ref.seq)?.slots[slot] : undefined;
+  const isGuard = (e: Event) => guards.has(e.type) && (slot === undefined || (subjectValue !== undefined && e.slots[slot] === subjectValue));
   return {
     interactionId: it.id,
     episodeId: ref.episodeId,
@@ -57,7 +65,7 @@ function timeline(byId: Map<string, Interaction>, rule: Rule, ref: Rule['example
         kind: e.kind,
         slots: e.slots,
         subject: e.seq === ref.seq,
-        guard: guard !== undefined && e.type === guard,
+        guard: isGuard(e),
         inEpisode: e.episode === ref.episodeId,
       }))
       // A thirty-line timeline of "utterance" buries the four lines that

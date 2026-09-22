@@ -299,7 +299,7 @@
       "events": 111926,
       "unknownRate": 0.035085681611064456,
       "rules": {
-        "proposed": 2802,
+        "proposed": 2827,
         "refused": 1708,
         "suppressed": 1619,
         "contradicted": 920,
@@ -332,9 +332,9 @@
           }
         },
         "precision": {
-          "strict": 0.029978586723768737,
-          "lenient": 0.029978586723768737,
-          "alignable": 0.029989289539450195
+          "strict": 0.029713477184294304,
+          "lenient": 0.029713477184294304,
+          "alignable": 0.029723991507430998
         },
         "recall": {
           "strict": 0.8666666666666667,
@@ -363,11 +363,11 @@
         "inexpressible": 15
       },
       "coverageCeiling": {
-        "coverage": 0.9792746113989638,
+        "coverage": 0.9613754121526142,
         "agreement": null,
         "outcomePrecision": null,
-        "cleared": 0.0009420631182289214,
-        "warned": 0.9783325482807348
+        "cleared": 0.015073009891662742,
+        "warned": 0.9463024022609515
       }
     },
     "cc-mimo": {
@@ -377,8 +377,8 @@
       "events": 14246,
       "unknownRate": 0.005685806542187281,
       "rules": {
-        "proposed": 117,
-        "refused": 132,
+        "proposed": 125,
+        "refused": 142,
         "suppressed": 70,
         "contradicted": 2,
         "recommendations": 7,
@@ -410,9 +410,9 @@
           }
         },
         "precision": {
-          "strict": 0.06363636363636363,
-          "lenient": 0.06363636363636363,
-          "alignable": 0.06422018348623854
+          "strict": 0.059322033898305086,
+          "lenient": 0.059322033898305086,
+          "alignable": 0.05982905982905983
         },
         "recall": {
           "strict": 0.13333333333333333,
@@ -423,7 +423,7 @@
           "lenient": 0.5,
           "den": 4
         },
-        "refusalCorrectness": 0.8787878787878788,
+        "refusalCorrectness": 0.8873239436619719,
         "failedShare": 0.04307334109429569,
         "gate": "falsified"
       },

@@ -63,7 +63,7 @@ async function episodeSoFar(hook, alphabet) {
   });
   const project = process.env.POLYX_OPERATOR ?? projectOf(basename(dirname(hook.transcript_path)));
   const raw = toRaw([...lines, pending].join('\n'), hook.transcript_path, project);
-  if (!raw) return { operator: project, before: [], considering: [] };
+  if (!raw) return { operator: project, before: [], contact: [], considering: [] };
   const typed = applyAlphabet(alphabet, raw);
   // The same segmenter the corpus was mined under: an obligation is measured
   // "in the same episode", and the episode has to mean the same thing here.
@@ -73,6 +73,11 @@ async function episodeSoFar(hook, alphabet) {
   const pendingEvents = typed.events.filter(isPending);
   const episode = pendingEvents.length ? local.get(pendingEvents[0].seq) : local.get(typed.events[typed.events.length - 1]?.seq);
   const before = typed.events.filter((e) => !isPending(e) && local.get(e.seq) === episode);
+  // The whole session so far, for rules measured over the contact: the read
+  // that licenses an edit is usually several prompts back. Types and slots
+  // only — the slots are what "the same file" is compared on, and they are
+  // the redacted tokens the corpus was mined with, never the path.
+  const contact = typed.events.filter((e) => !isPending(e)).map((e) => ({ type: e.type, kind: e.kind, slots: e.slots }));
   // The one field observation needs (JT8.2): what was SAID at each event, as
   // the adapter's own text source reads it from the record the event points
   // at. The advisor redacts it under the corpus profile before anything sees
@@ -99,7 +104,8 @@ async function episodeSoFar(hook, alphabet) {
       const text = textOf(e);
       return text ? { type: e.type, kind: e.kind, slots: e.slots, text } : { type: e.type, kind: e.kind, slots: e.slots };
     }),
-    considering: pendingEvents.map((e) => e.type).filter((t) => t !== 'unknown'),
+    contact,
+    considering: pendingEvents.filter((e) => e.type !== 'unknown').map((e) => ({ type: e.type, slots: e.slots })),
   };
 }
 
@@ -114,7 +120,7 @@ if (hook.hook_event_name && hook.hook_event_name !== 'PreToolUse') process.exit(
 if (!hook.transcript_path || !hook.tool_name) process.exit(0);
 
 const alphabet = loadAlphabet(process.env.POLYX_ALPHABET ?? builtinAlphabet('alphabet.cc.yaml'));
-const { operator, before, considering } = await episodeSoFar(hook, alphabet);
+const { operator, before, contact, considering } = await episodeSoFar(hook, alphabet);
 
 // An action the alphabet does not know is not a decision point polyx can
 // speak to. Allow it; the audit is where unknown actions get counted.
@@ -124,9 +130,9 @@ const warnings = [];
 const recommendations = [];
 const abstentions = [];
 try {
-  for (const action of considering) {
-    const out = await advise({ operator, episode: { events: before }, considering: action });
-    for (const w of out.warnings ?? []) warnings.push({ action, rule: w.rule, unsatisfied: w.unsatisfied });
+  for (const { type: action, slots } of considering) {
+    const out = await advise({ operator, episode: { events: before }, contact: { events: contact }, considering: action, consideringSlots: slots });
+    for (const w of out.warnings ?? []) warnings.push({ action, rule: w.rule, unsatisfied: w.unsatisfied, window: w.window });
     for (const a of out.actions ?? []) for (const r of a.rules) recommendations.push({ action: a.type, rule: r });
     if (out.abstention?.reason === 'unknown_fact') abstentions.push({ action, missing: out.abstention.missing });
   }
@@ -145,7 +151,8 @@ if (warnings.length) {
   // is the rule in its own words, with the number that backs it: not "you
   // may not", but "this held 41 of 47 times, and the thing it needs has not
   // happened yet".
-  const lines = warnings.map((w) => `polyx: ${w.rule.text} (held ${w.rule.support}, ${w.rule.provenance}; ${w.unsatisfied} has not happened yet in this episode)`);
+  const where = (w) => (w.window === 'interaction' ? 'this session' : 'this episode');
+  const lines = warnings.map((w) => `polyx: ${w.rule.text} (held ${w.rule.support}, ${w.rule.provenance}; ${w.unsatisfied} has not happened yet in ${where(w)})`);
   console.error([...new Set(lines)].join('\n'));
   process.exit(2);
 }

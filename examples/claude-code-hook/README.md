@@ -14,7 +14,8 @@ advisor on loopback. This page cannot drift from the code.
 polyx's runtime contract is one call, made *before a consequential action*:
 
 ```
-POST /advise  { operator, episode: { events: [...so far] }, considering: "action:git_push" }
+POST /advise  { operator, episode: { events: [...so far] }, contact: { events: [...the session] },
+                considering: "action:git_push", consideringSlots: { ... } }
 → { verdict: "warn" | "recommend" | "clear" | "abstain", warnings, actions, abstention }
 ```
 
@@ -38,8 +39,12 @@ session.
    re-implements how a Bash command is split or how a verb is recognised; the
    pending call is typed exactly as it would have been typed after the fact,
    and "the episode so far" is the same object the rules were mined over.
-3. One `POST /advise` per considered action. A Bash command with three
-   segments is three considerations.
+3. One `POST /advise` per considered action, carrying the episode, the whole
+   session so far as types and slots, and the considered action's own slots.
+   The session is what a rule measured over the contact is checked against
+   — the read that licenses an edit is usually several prompts back — and
+   the slots are what "the same file" is compared on: redacted tokens, never
+   the path. A Bash command with three segments is three considerations.
 4. Acts on the verdict:
 
 | verdict | the hook |
@@ -93,7 +98,19 @@ A push in a session where no tests have run:
 polyx: Before you push, run the tests. (held 41/47, own@operator; action:run_tests has not happened yet in this episode)
 ```
 
-That is the whole message. Not "you may not push" — polyx has no authority
+An edit to a file nothing in the session read or wrote, under the same-file
+rule (`no-X-without-prior-Y-same-S`, mined where the alphabet declares `file`
+an identity):
+
+```
+polyx: Before you edit a file, read a file or write a file whole — the same file, earlier in the contact. (held 87/94, own@operator; action:read_file or action:write_file on the same file has not happened yet in this session)
+```
+
+The type-level rule, "read a file before you edit one", is satisfied by a read
+of any file; this one is the edit made from a guess about a file never opened.
+Both messages are asserted verbatim by `test/hook.test.ts`.
+
+Each is the whole message. Not "you may not push" — polyx has no authority
 and claims none — but "this has held forty-one times out of forty-seven in
 your own history, and the thing it depends on has not happened yet". The
 model can run the tests and push, or push anyway if the user asks, exactly as

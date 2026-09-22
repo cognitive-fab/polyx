@@ -19,7 +19,10 @@
 // the corpus for the next mining pass.
 import { type Event, type Observation, type Scalar } from '@cognitive-fab/polyx-lens';
 import { evalAll, type FactBase } from '@cognitive-fab/polyx-lens';
-import { fraction, type Rule } from '@cognitive-fab/polyx-lens';
+import { fraction, type Rule, type Window } from '@cognitive-fab/polyx-lens';
+import { SAME_SLOT, splitGuards } from '../mine/patterns.ts';
+
+type RequestEvent = Pick<Event, 'type'> & Partial<Pick<Event, 'kind' | 'slots' | 'seq'>> & { text?: string };
 
 export interface AdviseRequest {
   operator: string;
@@ -32,10 +35,25 @@ export interface AdviseRequest {
    * called. Absent text means no observation, which is not an error. The
    * advisor itself never reads it and the decision log never stores it.
    */
-  episode: { events: Array<Pick<Event, 'type'> & Partial<Pick<Event, 'kind' | 'slots' | 'seq'>> & { text?: string }> };
+  episode: { events: RequestEvent[] };
+  /**
+   * The whole contact so far — every earlier episode of the interaction, and
+   * this one. A rule measured over the contact (`no-X-without-prior-Y` and
+   * its same-slot form) is checked against it. Absent, such a rule is
+   * satisfied by a guard in the episode and otherwise UNKNOWN: a guard not
+   * sent is not a guard that did not happen. Only types and slots are read;
+   * text on these events is never observed.
+   */
+  contact?: { events: RequestEvent[] };
   facts?: Record<string, Scalar>;
   /** The action under consideration. Obligations are checked against it; without it, only recommendations answer. */
   considering?: string;
+  /**
+   * The considered action's own slots, as the alphabet typed them. A
+   * same-slot rule compares them with its guards' — "read THIS file" needs
+   * to know which file — and without them it abstains.
+   */
+  consideringSlots?: Record<string, Scalar>;
 }
 
 export interface FiredRule {
@@ -55,7 +73,8 @@ export interface AdviseResponse {
    */
   verdict: 'recommend' | 'warn' | 'clear' | 'abstain';
   actions: Array<{ type: string; rules: FiredRule[] }>;
-  warnings: Array<{ rule: FiredRule; unsatisfied: string }>;
+  /** `window` is where the unsatisfied guard was looked for — the episode, or the whole contact. */
+  warnings: Array<{ rule: FiredRule; unsatisfied: string; window: Window }>;
   /** The obligations that applied to the considered action and were satisfied. */
   cleared: FiredRule[];
   abstention?: { reason: 'uncovered' | 'unknown_fact'; missing: string[] };
@@ -88,7 +107,54 @@ export interface DecisionRecord {
 }
 
 /** The obligation patterns the advisor knows how to check — one branch each below. */
-export const CHECKABLE = new Set(['X-implies-prior-Y', 'no-X-without-prior-Y', 'at-most-one-X', 'exactly-one-Y-per-X']);
+export const CHECKABLE = new Set(['X-implies-prior-Y', 'no-X-without-prior-Y', 'at-most-one-X', 'exactly-one-Y-per-X', SAME_SLOT]);
+
+type Check = { ok: true } | { ok: false; unsatisfied: string } | { unknown: string[] };
+
+/**
+ * A contact-window precedence, three-valued. The episode is searched first,
+ * because a guard there is a guard in the contact whether or not the contact
+ * was sent; only its absence from both licenses a warning. Before this, the
+ * contact-window rule was checked against the episode alone, and a guard two
+ * prompts back read as a guard that never happened.
+ */
+function contactPrecedence(req: AdviseRequest, found: (events: RequestEvent[]) => boolean | 'unknown', unsatisfied: string): Check {
+  const inEpisode = found(req.episode.events);
+  if (inEpisode === true) return { ok: true };
+  if (!req.contact) return { unknown: ['contact'] };
+  const inContact = found(req.contact.events);
+  if (inContact === true) return { ok: true };
+  if (inContact === 'unknown' || inEpisode === 'unknown') return { unknown: [] };
+  return { ok: false, unsatisfied };
+}
+
+/**
+ * `no-X-without-prior-Y-same-S`: some guard type, carrying the considered
+ * action's own value of the slot, earlier in the contact. A guard event that
+ * does not carry the slot might have been about the same thing and might
+ * not; it neither satisfies the rule nor lets it warn.
+ */
+function sameSlot(r: Rule, req: AdviseRequest): Check {
+  const slot = r.bindings.slot!;
+  const guards = new Set(splitGuards(r.bindings.guards));
+  const v = req.consideringSlots?.[slot];
+  if (v === undefined || v === null) return { unknown: [`considering.slot.${slot}`] };
+  let unsure = false;
+  const found = (events: RequestEvent[]): boolean | 'unknown' => {
+    let here = false;
+    for (const e of events) {
+      if (!guards.has(e.type)) continue;
+      const g = e.slots?.[slot];
+      if (g === v) return true;
+      if (g === undefined || g === null) here = true;
+    }
+    if (here) unsure = true;
+    return here ? 'unknown' : false;
+  };
+  const c = contactPrecedence(req, found, `${[...guards].join(' or ')} on the same ${slot}`);
+  if ('unknown' in c) return { unknown: c.unknown.length ? c.unknown : unsure ? [`slot.${slot}`] : [] };
+  return c;
+}
 
 const provenanceLabel = (r: Rule): string => {
   const v = r.provenance;
@@ -215,19 +281,29 @@ export class Advisor {
       for (const r of this.obligations.get(req.operator)?.get(req.considering) ?? []) {
         const { truth, unknown } = evalAll(r.conditions, facts);
         if (truth === false) continue;
-        if (truth === 'unknown') {
+        const guard = r.bindings.guard;
+        // What the request left out — the contact, the considered action's
+        // slot — is a property of the request, not of the fact base, so it is
+        // reported even while a condition is still unknown. Reported only
+        // once the condition resolved, an observation settling the condition
+        // would uncover it, and `missing` would GROW with observation: the
+        // invariant test caught exactly that (JF7.2).
+        const c = r.pattern === SAME_SLOT ? sameSlot(r, req) : r.pattern === 'no-X-without-prior-Y' ? contactPrecedence(req, (events) => events.some((e) => e.type === guard), guard!) : null;
+        if (truth === 'unknown' || (c && 'unknown' in c)) {
           for (const f of unknown) missing.add(f);
+          if (c && 'unknown' in c) for (const f of c.unknown) missing.add(f);
           continue;
         }
-        const guard = r.bindings.guard;
         const before = warnings.length;
-        if (r.pattern === 'X-implies-prior-Y' || r.pattern === 'no-X-without-prior-Y') {
-          if (!types.includes(guard!)) warnings.push({ rule: fired(r), unsatisfied: guard! });
+        if (r.pattern === 'X-implies-prior-Y') {
+          if (!types.includes(guard!)) warnings.push({ rule: fired(r), unsatisfied: guard!, window: 'episode' });
+        } else if (c) {
+          if (!c.ok) warnings.push({ rule: fired(r), unsatisfied: c.unsatisfied, window: 'interaction' });
         } else if (r.pattern === 'at-most-one-X') {
-          if (types.filter((t) => t === req.considering).length >= 1) warnings.push({ rule: fired(r), unsatisfied: `a second ${req.considering} in this episode` });
+          if (types.filter((t) => t === req.considering).length >= 1) warnings.push({ rule: fired(r), unsatisfied: `a second ${req.considering} in this episode`, window: 'episode' });
         } else if (r.pattern === 'exactly-one-Y-per-X') {
           const n = types.filter((t) => t === guard).length;
-          if (n !== 1) warnings.push({ rule: fired(r), unsatisfied: n === 0 ? guard! : `${guard} more than once` });
+          if (n !== 1) warnings.push({ rule: fired(r), unsatisfied: n === 0 ? guard! : `${guard} more than once`, window: 'episode' });
         }
         if (warnings.length === before) cleared.push(fired(r));
       }
@@ -290,6 +366,22 @@ export function parseRequest(body: unknown): AdviseRequest {
     return e as AdviseRequest['episode']['events'][number];
   });
   const out: AdviseRequest = { operator: b.operator, episode: { events } };
+  if (b.contact !== undefined) {
+    const c = b.contact as { events?: unknown };
+    if (typeof c !== 'object' || c === null || !Array.isArray(c.events)) throw new Error('contact.events must be an array');
+    out.contact = {
+      events: c.events.map((e, i) => {
+        if (typeof e !== 'object' || e === null || typeof (e as { type?: unknown }).type !== 'string') throw new Error(`contact.events[${i}].type must be a string`);
+        // Types and slots only: text on the contact is never observed, so it is not kept.
+        const { type, kind, slots, seq } = e as RequestEvent;
+        const kept: RequestEvent = { type };
+        if (kind !== undefined) kept.kind = kind;
+        if (slots !== undefined) kept.slots = slots;
+        if (seq !== undefined) kept.seq = seq;
+        return kept;
+      }),
+    };
+  }
   if (typeof b.agent === 'string') out.agent = b.agent;
   if (b.facts !== undefined) {
     if (typeof b.facts !== 'object' || b.facts === null || Array.isArray(b.facts)) throw new Error('facts must be an object');
@@ -301,6 +393,13 @@ export function parseRequest(body: unknown): AdviseRequest {
   if (b.considering !== undefined) {
     if (typeof b.considering !== 'string') throw new Error('considering must be a string');
     out.considering = b.considering;
+  }
+  if (b.consideringSlots !== undefined) {
+    if (typeof b.consideringSlots !== 'object' || b.consideringSlots === null || Array.isArray(b.consideringSlots)) throw new Error('consideringSlots must be an object');
+    for (const [k, v] of Object.entries(b.consideringSlots as Record<string, unknown>)) {
+      if (!(v === null || ['string', 'number', 'boolean'].includes(typeof v))) throw new Error(`consideringSlots.${k} must be a scalar`);
+    }
+    out.consideringSlots = b.consideringSlots as Record<string, Scalar>;
   }
   return out;
 }

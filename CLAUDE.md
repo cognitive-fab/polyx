@@ -84,6 +84,14 @@ memo silently serves the stale base for the rest of the run.
   Change the code, and the page changes in the same commit or CI goes red.
 - **`polyx.config.json` names shipped fixtures as `fixture:<path>`.** Do not
   replace that with a relative path into `node_modules`.
+- **`bin/polyx.mjs` runs `dist/` whenever it exists.** A build left over from
+  packing shadows every source edit, silently, for `polyx mine` and for the
+  advisor the hook talks to — the tests import `src/` and stay green. In a
+  checkout, `rm -rf dist` after `npm pack`; `prepare` rebuilds it to publish.
+- **Identity slots are declared in the alphabet, never inferred.** A
+  same-slot rule ("read THIS file first") exists only for event types whose
+  `identity:` names the slot. Declaring one moves no version: nothing is
+  typed differently, and a bump would stale every calibrated predicate.
 
 ## Editing
 

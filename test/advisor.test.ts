@@ -43,6 +43,53 @@ const req = (over: Partial<AdviseRequest>): AdviseRequest => ({ operator: 'op', 
 // recommend.test.ts; these tests are about evaluation semantics.
 const ANY: ReadonlySet<string> = { has: () => true } as unknown as ReadonlySet<string>;
 
+test('a contact-window rule is checked against the contact, and without one it abstains rather than warn', () => {
+  const advisor = new Advisor([rule({ pattern: 'no-X-without-prior-Y', window: 'interaction' })], ANY);
+  const considering = 'action:quote_rate';
+  // The guard two episodes back: sent, it satisfies the rule.
+  const earlier = { events: [{ type: 'action:disclose_terms' }] };
+  assert.equal(advisor.advise(req({ considering, contact: earlier })).verdict, 'clear');
+  // Not sent: a guard the caller did not send is not a guard that did not
+  // happen. This used to warn — checked against the episode alone.
+  assert.deepEqual(advisor.advise(req({ considering })).abstention, { reason: 'unknown_fact', missing: ['contact'] });
+  // In the episode, it needs no contact at all.
+  assert.equal(advisor.advise(req({ considering, episode: earlier })).verdict, 'clear');
+  // Sent, and not in it: now the warning is earned.
+  const warned = advisor.advise(req({ considering, contact: { events: [{ type: 'action:other' }] } }));
+  assert.equal(warned.verdict, 'warn');
+  assert.equal(warned.warnings[0]!.window, 'interaction');
+});
+
+test('same-slot: the guard must be about the same thing, and every way of not knowing that abstains', () => {
+  const sameFile = rule({
+    pattern: 'no-X-without-prior-Y-same-S',
+    window: 'interaction',
+    bindings: { subject: 'action:edit_file', guards: 'action:read_file|action:write_file', slot: 'file' },
+    text: 'Before you edit a file, read a file or write a file whole — the same file, earlier in the contact.',
+  });
+  const advisor = new Advisor([sameFile], ANY);
+  const considering = 'action:edit_file';
+  const read = (file?: string) => ({ type: 'action:read_file', ...(file === undefined ? {} : { slots: { file } }) });
+  const ask = (contact: ReturnType<typeof read>[] | undefined, slots?: Record<string, string>) =>
+    advisor.advise(req({ considering, ...(contact ? { contact: { events: contact } } : {}), ...(slots ? { consideringSlots: slots } : {}) }));
+
+  assert.equal(ask([read('file#a')], { file: 'file#a' }).verdict, 'clear');
+  // Written whole counts as known: the set, not one guard.
+  assert.equal(advisor.advise(req({ considering, contact: { events: [{ type: 'action:write_file', slots: { file: 'file#a' } }] }, consideringSlots: { file: 'file#a' } })).verdict, 'clear');
+  // Another file read is exactly what the type-level rule accepts and this one does not.
+  const other = ask([read('file#b')], { file: 'file#a' });
+  assert.equal(other.verdict, 'warn');
+  assert.equal(other.warnings[0]!.unsatisfied, 'action:read_file or action:write_file on the same file');
+  // Which file is being edited, unsaid: unknown, never "no file".
+  assert.deepEqual(ask([read('file#a')]).abstention?.missing, ['considering.slot.file']);
+  // A read that does not say which file might have been this one.
+  assert.deepEqual(ask([read()], { file: 'file#a' }).abstention?.missing, ['slot.file']);
+  // …but a read of this file elsewhere in the contact settles it.
+  assert.equal(ask([read(), read('file#a')], { file: 'file#a' }).verdict, 'clear');
+  // No contact and nothing in the episode.
+  assert.deepEqual(ask(undefined, { file: 'file#a' }).abstention?.missing, ['contact']);
+});
+
 test('F6.3 — the single most important test: removing a required fact produces abstain, not a changed answer', () => {
   const conditioned = rule({ id: 'c', conditions: [{ fact: 'product.type', op: 'eq', value: 'mortgage' }] });
   const advisor = new Advisor([conditioned], ANY);

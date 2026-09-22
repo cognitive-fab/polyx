@@ -13,11 +13,18 @@
 //   exact     same subject and guard; the rule's condition names the clause's scope
 //   general   same subject and guard; the rule is unconditioned (it claims more than the clause)
 //   proposed  same subject and guard; the rule is conditioned on something the clause does not name
+//
+// A same-slot rule ("read THIS file first") states the clause's pair and
+// more, so with a single guard it matches as the pair does. With a guard set
+// ("read it or write it") it is weaker than a clause naming one of them, and
+// is never better than `proposed`: a person decides whether "or write it" is
+// what the clause meant.
 import { readFileSync, existsSync } from 'node:fs';
 import { type Rule } from '@cognitive-fab/polyx-lens';
 import { parse } from 'yaml';
 import type { Clause, Policy } from './policies/index.ts';
 import { cmp } from '@cognitive-fab/polyx-lens';
+import { SAME_SLOT, splitGuards } from '../mine/patterns.ts';
 
 export type MatchKind = 'exact' | 'general' | 'proposed';
 
@@ -68,8 +75,15 @@ export function align(rules: Rule[], policy: Policy): Alignment[] {
       }
       continue;
     }
-    if (!PRECEDENCE.has(r.pattern)) continue;
-    const clauses = byPair.get(`${r.bindings.subject}|${r.bindings.guard}`) ?? [];
+    if (r.pattern === SAME_SLOT) {
+      const guards = splitGuards(r.bindings.guards);
+      if (guards.length > 1) {
+        for (const g of guards) for (const c of byPair.get(`${r.bindings.subject}|${g}`) ?? []) out.push({ ruleId: r.id, scope: r.scope, clauseId: c.id, kind: 'proposed' });
+        continue;
+      }
+    } else if (!PRECEDENCE.has(r.pattern)) continue;
+    const guard = r.pattern === SAME_SLOT ? splitGuards(r.bindings.guards)[0] : r.bindings.guard;
+    const clauses = byPair.get(`${r.bindings.subject}|${guard}`) ?? [];
     const pairScopes = new Set(clauses.filter((c) => c.when).map((c) => String(c.when!.value)));
     const coversAll = pairScopes.size > 0 && pairScopes.size === (scopesOfSubject.get(r.bindings.subject!)?.size ?? -1);
     for (const c of clauses) {

@@ -88,9 +88,14 @@ export async function replay(corpus: LoadedCorpus, rules: Rule[], store?: Store,
     const req: AdviseRequest = {
       operator: i.actor.operatorId,
       episode: { events: i.before.map((e) => ({ type: e.type, kind: e.kind, slots: e.slots })) },
+      // The replay knows the whole contact, so it sends it: a contact-window
+      // rule answered here from the episode alone would abstain where the
+      // live hook, which also sends it, would not.
+      contact: { events: i.sessionBefore.map((e) => ({ type: e.type, kind: e.kind, slots: e.slots })) },
       facts: i.facts ?? {},
       considering: p.action,
     };
+    if (i.event.type === p.action) req.consideringSlots = i.event.slots;
     // The served verdict is the one WITH observation. The one without is
     // computed beside it so the yield is measured rather than assumed.
     const obs: Observation[] = Object.entries(i.observed ?? {}).map(([fact, value]) => ({ predicate: fact, fact, value, p: value === null ? 0.5 : value ? 1 : 0 }));

@@ -14,6 +14,7 @@
 import { type Rule } from '@cognitive-fab/polyx-lens';
 import type { Alignment } from './align.ts';
 import type { Policy } from './policies/index.ts';
+import { SAME_SLOT } from '../mine/patterns.ts';
 
 export interface Ratio {
   num: number;
@@ -45,7 +46,7 @@ export interface Metrics {
 }
 
 /** Rule shapes a policy clause set can state at all. */
-const ALIGNABLE = new Set(['X-implies-prior-Y', 'no-X-without-prior-Y', 'at-most-one-X']);
+const ALIGNABLE = new Set(['X-implies-prior-Y', 'no-X-without-prior-Y', 'at-most-one-X', SAME_SLOT]);
 
 export function metrics(allRules: Rule[], policy: Policy, alignments: Alignment[]): Metrics {
   // Policy conformance is a question about OBLIGATIONS. Recommendations are

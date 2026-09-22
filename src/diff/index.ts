@@ -18,6 +18,7 @@ import { controls, type ClauseExercise } from '../evaluate/controls.ts';
 import { loadPolicy, type Clause, type Policy } from '../evaluate/policies/index.ts';
 import { fraction, type InstanceRef, type Rule } from '@cognitive-fab/polyx-lens';
 import { cmp } from '@cognitive-fab/polyx-lens';
+import { guardTypes } from '../mine/patterns.ts';
 
 /**
  * Why a mined rule has no clause (human ruling, 29 Aug 2026).
@@ -126,7 +127,7 @@ export async function diff(
     } else if (as.length) undecided.push(ruleView(r, byClause, as));
     else {
       const f = ruleView(r, byClause, []);
-      const elsewhere = writtenIn.get(`${r.bindings.subject}>${r.bindings.guard}`) ?? [];
+      const elsewhere = [...new Set(guardTypes(r.bindings).flatMap((g) => writtenIn.get(`${r.bindings.subject}>${g}`) ?? []))];
       // A rule conditioned on flow X whose pair is written only for flow Y is
       // the practice extended beyond the policy, not a novel practice.
       const mineFlow = r.conditions.find((c) => c.fact === 'episode.intent');

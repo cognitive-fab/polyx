@@ -16,7 +16,7 @@ import { contradictions as findContradictions, type Contradiction } from './cont
 import { instanceFacts } from './facts.ts';
 import { scoreCandidate, specKey, synthesise, type CandidateSpec, type SynthesisContext } from './obligation.ts';
 import { evidenceSentence, provenance } from './provenance.ts';
-import { VACUOUS_EPISODE } from './patterns.ts';
+import { SAME_SLOT, VACUOUS_EPISODE } from './patterns.ts';
 import { subsumed } from './subsumption.ts';
 import { ref, sample } from './support.ts';
 import { decisionPoints, refs, synthesiseRecommendations } from './recommend.ts';
@@ -111,7 +111,8 @@ export async function mine(corpus: LoadedCorpus, thresholds: Thresholds, opts: M
   const rules: Rule[] = [];
   const allContradictions: Contradiction[] = [];
 
-  const ctx: SynthesisContext = { thresholds: t, label };
+  const identities = new Map(corpus.alphabet.eventTypes.filter((e) => e.identity?.length).map((e) => [e.id, e.identity!]));
+  const ctx: SynthesisContext = { thresholds: t, label, identity: (type) => identities.get(type) ?? [] };
   if (opts.requested) ctx.requested = opts.requested;
   const byOperator = (subject: Subject) => {
     const m = new Map<string, Instance[]>();
@@ -134,8 +135,20 @@ export async function mine(corpus: LoadedCorpus, thresholds: Thresholds, opts: M
     for (const [, own] of byOperator(subject)) {
       if (own.length < t.minInstances) continue;
       for (const c of synthesise({ type: subject.type, instances: own }, ctx)) {
-        const k = specKey(c);
-        if (!perSubject.has(k)) {
+        // A same-slot candidate's guard set is found per operator, and one
+        // operator that never wrote a file whole proposes "read it first"
+        // while the next proposes "read it or write it". Scored everywhere as
+        // two rules, the narrower one — 435 of 990 at the operator that
+        // mostly wrote before editing — implied the wider one out of the
+        // proposed set. So there is ONE candidate per subject, slot and
+        // condition, and its set is the union of what each operator found.
+        const sameSlot = c.pattern.name === SAME_SLOT;
+        const k = sameSlot ? specKey({ ...c, args: { subject: c.args.subject, slot: c.args.slot! } }) : specKey(c);
+        const had = perSubject.get(k);
+        if (had && sameSlot) {
+          had.args = { ...had.args, guards: [...new Set([...had.args.guards!, ...c.args.guards!])].sort(cmp) };
+          if (c.parentId && !had.parentId) had.parentId = c.parentId;
+        } else if (!had) {
           const spec: CandidateSpec = { pattern: c.pattern, args: c.args, conditions: c.conditions };
           if (c.parentId) spec.parentId = c.parentId;
           perSubject.set(k, spec);

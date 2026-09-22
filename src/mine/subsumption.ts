@@ -14,10 +14,16 @@
 //      "Exactly once" is "at least once" plus "at most once"; the first half
 //      is the implies rule, and the second is at-most-one-Y's to state if Y
 //      ever repeats. Kept only when the implies rule is not proposed.
+//   4. no-X-without-prior-Y  ⇐  no-X-without-prior-Y-same-S with guards {Y}
+//      "Read this file first" is "read a file first" and more. A guard SET
+//      implies no single-guard rule, and there is only ever one set per
+//      subject and slot (see the first pass in index.ts), so there is no
+//      same-slot rule for another to imply.
 //
 // Anything subtler — co-existence, absence — is left to the reviewer.
 import { type Condition, type Window } from '@cognitive-fab/polyx-lens';
 import { canonicalJson } from '../store/identity.ts';
+import { SAME_SLOT, splitGuards } from './patterns.ts';
 export interface Prunable {
   id: string;
   pattern: string;
@@ -40,11 +46,18 @@ export function subsumed(proposed: Prunable[]): Map<string, string[]> {
     l.push(r);
   }
   const find = (subject: string, guard: string, k: string) => bySubject.get(`${k}|${subject}`)?.find((r) => r.bindings.guard === guard);
+  const sameSlot = proposed.filter((r) => r.pattern === SAME_SLOT);
+  const narrower = (r: Prunable, test: (guards: string[]) => boolean) =>
+    sameSlot.find((s) => s.id !== r.id && s.bindings.subject === r.bindings.subject && key(s) === key(r) && test(splitGuards(s.bindings.guards)));
 
   for (const r of proposed) {
     if (r.pattern === 'no-X-without-prior-Y') {
       const ep = find(r.bindings.subject!, r.bindings.guard!, canonicalJson({ c: r.conditions, w: 'episode' }));
       if (ep) out.set(r.id, [ep.id]);
+      else {
+        const s = narrower(r, (g) => g.length === 1 && g[0] === r.bindings.guard);
+        if (s) out.set(r.id, [s.id]);
+      }
     } else if (r.pattern === 'exactly-one-Y-per-X') {
       const ep = find(r.bindings.subject!, r.bindings.guard!, key(r));
       if (ep) out.set(r.id, [ep.id]);

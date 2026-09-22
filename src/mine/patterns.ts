@@ -8,6 +8,16 @@
 //   no-X-without-prior-Y     precedence(Y, X)             interaction
 //   at-most-one-X            absence2(X)                  episode
 //   exactly-one-Y-per-X      co-existence + absence2(Y)   episode
+//   no-X-without-prior-Y-same-S   precedence(Y, X) on one S   interaction
+//
+// The last is the only one that looks inside an event. Where the alphabet
+// declares a slot an IDENTITY — `file` on reading and editing a file — the
+// guard must have been about the same thing: not "read a file before you
+// edit one", which any earlier read satisfies, but "read THIS file". It is
+// measured over the contact, because the read that licenses an edit is
+// routinely several prompts earlier: on the cc corpus a same-file read or
+// write sat in the edit's own episode four times in ten, and in its session
+// nine times in ten.
 //
 // A GUARD has to be a step — an action — never an utterance. "Every refund
 // was preceded by the customer saying something" is true and useless: nobody
@@ -19,7 +29,27 @@ import { cmp } from '@cognitive-fab/polyx-lens';
 export interface PatternArgs {
   subject: string;
   guard?: string;
+  /** Same-slot patterns only: any of these, carrying the subject's value of `slot`, satisfies the rule. */
+  guards?: string[];
+  slot?: string;
 }
+
+/** The identity slots the alphabet declares for an event type (`EventType.identity`). */
+export type IdentityOf = (type: string) => readonly string[];
+
+/** The one pattern whose guard is about the same thing as its subject. */
+export const SAME_SLOT = 'no-X-without-prior-Y-same-S';
+
+/**
+ * A same-slot rule's guard set, as stored: `bindings.guards`, the types
+ * sorted and joined by `|`. Kept out of `bindings.guard`, which every other
+ * consumer reads as one type.
+ */
+export const joinGuards = (guards: readonly string[]): string => [...guards].sort(cmp).join('|');
+export const splitGuards = (joined: string | undefined): string[] => (joined ? joined.split('|') : []);
+
+/** Every guard type a rule names, whichever key it is stored under. */
+export const guardTypes = (bindings: Record<string, string>): string[] => (bindings.guard ? [bindings.guard] : splitGuards(bindings.guards));
 
 export interface GuardStat {
   type: string;
@@ -32,7 +62,7 @@ export interface Pattern {
   window: Window;
   perEpisode: boolean;
   needsGuard: boolean;
-  candidates(subject: Subject, t: Thresholds): PatternArgs[];
+  candidates(subject: Subject, t: Thresholds, identity: IdentityOf): PatternArgs[];
   holds(args: PatternArgs): (i: Instance) => boolean;
   /** Below this share of instances the rule is a habit, not an obligation. */
   minSupport(t: Thresholds): number;
@@ -73,7 +103,7 @@ export function guardStats(instances: Instance[], subject: string, window: 'befo
 }
 
 /** Alphabet ids are `[a-z0-9_:.${}-]`; quoting them anyway keeps the emitter honest about injection. */
-const q = (s: string) => JSON.stringify(s);
+const q = (s: string | string[]) => JSON.stringify(s);
 
 /** The default suppression wording: the episode-window vacuity `at-most-one` asks. */
 export const VACUOUS_EPISODE = 'vacuous: no episode in the corpus could have violated it';
@@ -195,6 +225,69 @@ export const PATTERNS: Pattern[] = [
     why: ({ guard }, l) => `${l(guard!)} happened once per episode, never twice`,
     predicate: ({ subject, guard }) =>
       `(ep) => !ep.events.some((e) => e.type === ${q(subject)}) || ep.events.filter((e) => e.type === ${q(guard!)}).length === 1`,
+  },
+  {
+    name: SAME_SLOT,
+    window: 'interaction',
+    perEpisode: false,
+    needsGuard: true,
+    /**
+     * One candidate per identity slot, whose guard is a SET: every action
+     * type that carries the same slot and came first on the same value often
+     * enough to count (`minInstances`), best first, capped like guards are.
+     *
+     * A set because the norm this exists for has two ways to be met. Claude
+     * Code will not edit a file it has neither read nor written, and on the
+     * cc corpus a same-file read preceded 1,635 of 3,930 edits in the session
+     * while a same-file read or whole write preceded 3,426. A read-only rule
+     * would warn on every edit to a file the agent had just written — true to
+     * the count and wrong about the world.
+     *
+     * The subject is never in its own set: an earlier edit of the file
+     * "licensing" a later one is the circular rule `guardStats` refuses too.
+     */
+    candidates: ({ type, instances }, t, identity) => {
+      const out: PatternArgs[] = [];
+      for (const slot of identity(type)) {
+        // Every instance must carry the value. One that does not can only be
+        // counted as failing, which is the closed-world assumption.
+        if (!instances.every((i) => i.event.slots[slot] !== undefined)) continue;
+        const seen = new Map<string, number>();
+        let covered = 0;
+        for (const i of instances) {
+          const v = i.event.slots[slot];
+          const here = new Set(
+            i.sessionBefore.filter((e) => e.kind === 'action' && e.type !== type && e.type !== UNKNOWN_TYPE && e.slots[slot] === v && identity(e.type).includes(slot)).map((e) => e.type),
+          );
+          if (here.size) covered++;
+          for (const g of here) seen.set(g, (seen.get(g) ?? 0) + 1);
+        }
+        const guards = [...seen]
+          .filter(([, n]) => n >= t.minInstances)
+          .sort((a, b) => b[1] - a[1] || cmp(a[0], b[0]))
+          .slice(0, t.maxGuardRules)
+          .map(([g]) => g);
+        if (!guards.length || covered / instances.length < t.guardSupport) continue;
+        out.push({ subject: type, guards: guards.sort(cmp), slot });
+      }
+      return out;
+    },
+    holds: ({ guards, slot }) => {
+      const set = new Set(guards);
+      return (i) => {
+        const v = i.event.slots[slot!];
+        return v !== undefined && i.sessionBefore.some((e) => set.has(e.type) && e.slots[slot!] === v);
+      };
+    },
+    // The contact window's bar, as for `no-X-without-prior-Y`. No vacuity
+    // test: that one exists because a long contact makes "some directory was
+    // listed earlier" trivially true, and "this very file was read earlier"
+    // is never true by the length of the sitting.
+    minSupport: (t) => t.ownSupport,
+    text: ({ subject, guards, slot }, l) => `Before you ${l(subject)}, ${guards!.map(l).join(' or ')} — the same ${slot}, earlier in the contact.`,
+    why: ({ guards, slot }, l) => `the same ${slot} had been through ${guards!.map(l).join(' or ')} first, most of the time`,
+    predicate: ({ subject, guards, slot }) =>
+      `(it) => it.events.every((e, i) => e.type !== ${q(subject)} || it.events.slice(0, i).some((g) => ${q(guards!)}.includes(g.type) && g.slots[${q(slot!)}] === e.slots[${q(slot!)}]))`,
   },
 ];
 

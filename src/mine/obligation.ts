@@ -10,7 +10,7 @@
 import { type Condition, type Instance, type Subject, type Thresholds, type Window } from '@cognitive-fab/polyx-lens';
 import { evalCondition, renderCondition } from '@cognitive-fab/polyx-lens';
 import { candidateConditions, instanceFacts, MAX_CONDITION_VALUES } from './facts.ts';
-import { PATTERNS, type Pattern, type PatternArgs } from './patterns.ts';
+import { joinGuards, PATTERNS, type IdentityOf, type Pattern, type PatternArgs } from './patterns.ts';
 import { measure, type Measured } from './support.ts';
 import { cmp } from '@cognitive-fab/polyx-lens';
 
@@ -35,11 +35,23 @@ export interface Candidate {
 export interface SynthesisContext {
   thresholds: Thresholds;
   label: (type: string) => string;
+  /** Identity slots per event type, from the alphabet. Absent: none, and no same-slot rule is mined. */
+  identity?: IdentityOf;
   /** Conditions a reviewer asked for on a parent rule (`narrowed`), keyed by the parent's bindings. */
   requested?: Array<{ pattern: string; bindings: Record<string, string>; window: Window; condition: Condition; parentId: string }>;
 }
 
 const ratio = (m: Measured) => (m.of === 0 ? 0 : m.holds / m.of);
+const NO_IDENTITY: IdentityOf = () => [];
+
+/** What a rule stores of its arguments. A same-slot rule's guard set and slot are part of what it says, so part of its id. */
+function bindingsOf(args: PatternArgs): Record<string, string> {
+  const b: Record<string, string> = { subject: args.subject };
+  if (args.guard) b.guard = args.guard;
+  if (args.guards) b.guards = joinGuards(args.guards);
+  if (args.slot) b.slot = args.slot;
+  return b;
+}
 
 function conditionedText(base: string, conditions: Condition[]): string {
   if (!conditions.length) return base;
@@ -66,10 +78,9 @@ export function synthesise(subject: Subject, ctx: SynthesisContext): Candidate[]
   };
 
   for (const pattern of PATTERNS) {
-    for (const args of pattern.candidates(subject, t)) {
+    for (const args of pattern.candidates(subject, t, ctx.identity ?? NO_IDENTITY)) {
       const holds = pattern.holds(args);
-      const bindings: Record<string, string> = { subject: args.subject };
-      if (args.guard) bindings.guard = args.guard;
+      const bindings = bindingsOf(args);
       const base = measure(subject.instances, holds, { perEpisode: pattern.perEpisode });
       const vacuous = pattern.vacuous?.(args, subject.instances) ?? false;
       const text = pattern.text(args, ctx.label);
@@ -95,7 +106,7 @@ export function synthesise(subject: Subject, ctx: SynthesisContext): Candidate[]
       // only single conditions for obligations (conjunctions are the
       // recommendation family's search, TS §7.3).
       const requested = (ctx.requested ?? []).filter(
-        (r) => r.pattern === pattern.name && r.window === pattern.window && r.bindings.subject === args.subject && r.bindings.guard === args.guard,
+        (r) => r.pattern === pattern.name && r.window === pattern.window && r.bindings.subject === args.subject && r.bindings.guard === args.guard && r.bindings.guards === bindings.guards && r.bindings.slot === bindings.slot,
       );
       const tryConditions: Condition[] = requested.map((r) => r.condition);
       if (ratio(base) < pattern.minSupport(t)) {
@@ -163,7 +174,7 @@ export interface CandidateSpec {
 }
 
 export const specKey = (s: { pattern: { name: string } | string; args: PatternArgs; conditions: Condition[] }): string =>
-  `${typeof s.pattern === 'string' ? s.pattern : s.pattern.name}|${s.args.subject}|${s.args.guard ?? ''}|${JSON.stringify(s.conditions)}`;
+  `${typeof s.pattern === 'string' ? s.pattern : s.pattern.name}|${s.args.subject}|${s.args.guard ?? ''}|${s.args.guards ? joinGuards(s.args.guards) : ''}|${s.args.slot ?? ''}|${JSON.stringify(s.conditions)}`;
 
 /**
  * Score a candidate found elsewhere against THESE instances (F4.4: a rule
@@ -175,8 +186,7 @@ export function scoreCandidate(spec: CandidateSpec, instances: Instance[], ctx: 
   const t = ctx.thresholds;
   const { pattern, args, conditions } = spec;
   const holds = pattern.holds(args);
-  const bindings: Record<string, string> = { subject: args.subject };
-  if (args.guard) bindings.guard = args.guard;
+  const bindings = bindingsOf(args);
   const selected = conditions.length ? instances.filter((i) => conditions.every((c) => evalCondition(c, instanceFacts(i)) === true)) : instances;
   if (selected.length < t.minInstances) return undefined;
   const measured = measure(selected, holds, { perEpisode: pattern.perEpisode });

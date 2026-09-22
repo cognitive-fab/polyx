@@ -50,7 +50,7 @@ const VALUES: Array<string | number | boolean> = [true, false, 'x', 'intent:comp
 const rule = (r: () => number, i: number, actions: string[], subjects: string[]): Rule => {
   const obligation = r() < 0.5;
   const conditions = Array.from({ length: Math.floor(r() * 3) }, () => ({ fact: FACTS[Math.floor(r() * FACTS.length)]!, op: 'eq' as const, value: VALUES[Math.floor(r() * VALUES.length)]! }));
-  const patterns = ['X-implies-prior-Y', 'no-X-without-prior-Y', 'at-most-one-X', 'exactly-one-Y-per-X'] as const;
+  const patterns = ['X-implies-prior-Y', 'no-X-without-prior-Y', 'at-most-one-X', 'exactly-one-Y-per-X', 'no-X-without-prior-Y-same-S'] as const;
   const pattern = obligation ? patterns[Math.floor(r() * patterns.length)]! : 'antecedent-implies-action';
   const subject = subjects[Math.floor(r() * subjects.length)]!;
   const guard = subjects[Math.floor(r() * subjects.length)]!;
@@ -58,7 +58,13 @@ const rule = (r: () => number, i: number, actions: string[], subjects: string[])
     id: `r${i}`,
     family: obligation ? 'obligation' : 'recommendation',
     pattern,
-    bindings: obligation ? (pattern === 'at-most-one-X' ? { subject } : { subject, guard }) : { action: actions[Math.floor(r() * actions.length)]! },
+    bindings: obligation
+      ? pattern === 'at-most-one-X'
+        ? { subject }
+        : pattern === 'no-X-without-prior-Y-same-S'
+          ? { subject, guards: guard, slot: 'account_id' }
+          : { subject, guard }
+      : { action: actions[Math.floor(r() * actions.length)]! },
     conditions,
     window: 'episode',
     support: { holds: 9, of: 10 },
@@ -127,6 +133,10 @@ test('JF7: over every decision point of the synthetic corpus, observation never 
           // Half the time the caller states something too, including names an
           // observation will collide with: JF5.2 has to make that harmless.
           ...(r() < 0.5 ? { facts: { 'customer.member_level': 'gold', ...(r() < 0.3 ? { 'obs.a': false } : {}) } } : {}),
+          // Half the time the contact and the considered action's slots too,
+          // so the contact-window and same-slot checks run both ways — the
+          // structural unknowns they report must not grow with observation.
+          ...(r() < 0.5 ? { contact: { events: i.sessionBefore.map((e) => ({ type: e.type, kind: e.kind, slots: e.slots })) }, consideringSlots: i.event.slots } : {}),
           considering: p.action,
         };
         for (let k = 0; k < 3; k++) {

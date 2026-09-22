@@ -93,6 +93,59 @@ test('the hook blocks a push that has not been preceded by a test run, in the ru
   }
 });
 
+/** "Before you edit a file, read it or write it whole — the same file" — the same-slot pattern, real for ledger-api. */
+const EDIT_NEEDS_SAME_FILE: Rule = {
+  ...PUSH_NEEDS_TESTS,
+  id: 'edit-needs-same-file',
+  pattern: 'no-X-without-prior-Y-same-S',
+  bindings: { subject: 'action:edit_file', guards: 'action:read_file|action:write_file', slot: 'file' },
+  window: 'interaction',
+  support: { holds: 87, of: 94 },
+  corpusSupport: { holds: 87, of: 94 },
+  text: 'Before you edit a file, read a file or write a file whole — the same file, earlier in the contact.',
+};
+
+test('the same-file rule blocks an edit to a file the session never opened, and allows one it did', async () => {
+  const ws = tempWorkspace();
+  const store = openStore(ws.config.dbPath);
+  const manifest = { runId: 'r', command: 'mine', at: 0, corpus: 'cc-sample', corpusRevision: 'x', alphabetVersion: 1, alphabetFile: 'x', thresholds: ws.thresholds, seed: 1, codeCommit: null, segmenter: 'polyness' };
+  store
+    .prepare('INSERT INTO runs (id, command, at, corpus, corpus_revision, alphabet_version, thresholds_json, seed, code_commit, manifest_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+    .run(manifest.runId, manifest.command, manifest.at, manifest.corpus, manifest.corpusRevision, manifest.alphabetVersion, JSON.stringify(ws.thresholds), 1, null, JSON.stringify(manifest));
+  persistMined(store, manifest, [EDIT_NEEDS_SAME_FILE], [], ws.thresholds);
+  store.close();
+  const alphabet = loadAlphabet(builtinAlphabet('alphabet.cc.yaml')!);
+  const srv = await startAdvisorServer({ dbPath: ws.config.dbPath, corpus: 'cc-sample', recommendable: recommendableTypes(alphabet) });
+  try {
+    const env = { POLYX_ADVISOR_URL: srv.url };
+    // src/report.ts was read earlier in the session — in an earlier episode,
+    // so this passes only because the hook sends the whole contact.
+    const known = await run(event('Edit', { file_path: 'src/report.ts', old_string: 'a', new_string: 'b' }), env);
+    assert.equal(known.status, 0, known.stderr);
+    assert.equal(known.stderr, '');
+
+    // A file nothing in the session read or wrote: the type-level rule would
+    // be satisfied by the reads of other files; this one is not.
+    const guess = await run(event('Edit', { file_path: 'src/never-opened.ts', old_string: 'a', new_string: 'b' }), env);
+    assert.equal(guess.status, 2, guess.stderr);
+    assert.match(
+      guess.stderr,
+      /polyx: Before you edit a file, read a file or write a file whole — the same file, earlier in the contact\. \(held 87\/94, own@operator; action:read_file or action:write_file on the same file has not happened yet in this session\)/,
+    );
+
+    // The allowed edit was CLEARED, not abstained on: without the contact the
+    // advisor cannot see a read two prompts back, and says so rather than
+    // guessing — which the hook would also have let through.
+    const log = openStore(ws.config.dbPath);
+    const verdicts = log.prepare("SELECT verdict FROM decision_points WHERE considering = 'action:edit_file' ORDER BY id").all().map((r) => (r as { verdict: string }).verdict);
+    log.close();
+    assert.deepEqual(verdicts, ['clear', 'warn']);
+  } finally {
+    await srv.close();
+    ws.cleanup();
+  }
+});
+
 test('the hook fails open when the advisor is down, and closed when told to', async () => {
   const dead = { POLYX_ADVISOR_URL: 'http://127.0.0.1:1' };
   const open = await run(event('Bash', { command: 'git push' }), dead);

@@ -27,6 +27,7 @@ import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
 import { cmp } from '@cognitive-fab/polyx-lens';
 import { fraction, type Rule } from '@cognitive-fab/polyx-lens';
 import { align, type MatchKind } from './align.ts';
+import { guardTypes } from '../mine/patterns.ts';
 import type { Clause, Policy } from './policies/index.ts';
 export type Stratum = 'exact' | 'general' | 'proposed' | 'near-miss' | 'tribal';
 
@@ -87,7 +88,7 @@ function compareRows(r: Rule, c: Clause, label: (t: string) => string): CompareR
   const ruleFlow = r.conditions.find((x) => x.fact === 'episode.intent');
   const rf = ruleFlow ? label(String(ruleFlow.value)) : '(every flow)';
   const cf = c.when ? label(String(c.when.value)) : '(every flow)';
-  const rg = r.bindings.guard ? label(r.bindings.guard) : NONE;
+  const rg = guardTypes(r.bindings).length ? guardTypes(r.bindings).map(label).join(' or ') + (r.bindings.slot ? ` (the same ${r.bindings.slot})` : '') : NONE;
   const cg = c.guard ? label(c.guard) : NONE;
   const ra = r.bindings.subject ? label(r.bindings.subject) : NONE;
   const ca = c.subject ? label(c.subject) : NONE;
